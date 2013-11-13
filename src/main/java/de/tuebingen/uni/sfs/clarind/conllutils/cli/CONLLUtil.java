@@ -2,10 +2,7 @@ package de.tuebingen.uni.sfs.clarind.conllutils.cli;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import de.tuebingen.uni.sfs.clarind.conllutils.tools.ReplaceTool;
-import de.tuebingen.uni.sfs.clarind.conllutils.tools.SamplingTool;
-import de.tuebingen.uni.sfs.clarind.conllutils.tools.TCFTool;
-import de.tuebingen.uni.sfs.clarind.conllutils.tools.Tool;
+import de.tuebingen.uni.sfs.clarind.conllutils.tools.*;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -13,8 +10,11 @@ import java.util.List;
 import java.util.Map;
 
 public class CONLLUtil {
-    private static final List<Tool> TOOLS = ImmutableList.of(new SamplingTool(CONLLUtil.class.getSimpleName()),
-            new TCFTool(CONLLUtil.class.getSimpleName()), new ReplaceTool(CONLLUtil.class.getSimpleName()));
+    private static final List<Tool> TOOLS = ImmutableList.of(
+            new SamplingTool(CONLLUtil.class.getSimpleName()),
+            new POSTagTool(CONLLUtil.class.getSimpleName()),
+            new TCFTool(CONLLUtil.class.getSimpleName()),
+            new ReplaceTool(CONLLUtil.class.getSimpleName()));
     private static final Map<String, Tool> TOOLS_MAP = createToolsMap(TOOLS);
 
     private static Map<String, Tool> createToolsMap(List<Tool> tools) {
