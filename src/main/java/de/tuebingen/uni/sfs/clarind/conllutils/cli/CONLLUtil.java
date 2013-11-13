@@ -1,11 +1,11 @@
-package de.tuebingen.uni.sfs.clarind.cli;
+package de.tuebingen.uni.sfs.clarind.conllutils.cli;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import de.tuebingen.uni.sfs.clarind.tools.ReplaceTool;
-import de.tuebingen.uni.sfs.clarind.tools.SamplingTool;
-import de.tuebingen.uni.sfs.clarind.tools.TCFTool;
-import de.tuebingen.uni.sfs.clarind.tools.Tool;
+import de.tuebingen.uni.sfs.clarind.conllutils.tools.ReplaceTool;
+import de.tuebingen.uni.sfs.clarind.conllutils.tools.SamplingTool;
+import de.tuebingen.uni.sfs.clarind.conllutils.tools.TCFTool;
+import de.tuebingen.uni.sfs.clarind.conllutils.tools.Tool;
 
 import java.io.IOException;
 import java.util.Arrays;

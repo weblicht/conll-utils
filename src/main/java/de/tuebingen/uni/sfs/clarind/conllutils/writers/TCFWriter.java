@@ -1,7 +1,7 @@
-package de.tuebingen.uni.sfs.clarind.writers;
+package de.tuebingen.uni.sfs.clarind.conllutils.writers;
 
 import com.google.common.base.Optional;
-import de.tuebingen.uni.sfs.clarind.readers.CONLLToken;
+import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLToken;
 import eu.clarin.weblicht.wlfxb.tc.api.*;
 import eu.clarin.weblicht.wlfxb.tc.xb.TextCorpusStored;
 import eu.clarin.weblicht.wlfxb.xb.WLData;

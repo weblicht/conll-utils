@@ -1,4 +1,4 @@
-package de.tuebingen.uni.sfs.clarind.readers;// Copyright 2008, 2009, 2013 Daniel de Kok
+package de.tuebingen.uni.sfs.clarind.conllutils.readers;// Copyright 2008, 2009, 2013 Daniel de Kok
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.

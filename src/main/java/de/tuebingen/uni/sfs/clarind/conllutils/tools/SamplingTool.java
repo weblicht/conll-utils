@@ -1,10 +1,10 @@
-package de.tuebingen.uni.sfs.clarind.tools;
+package de.tuebingen.uni.sfs.clarind.conllutils.tools;
 
-import de.tuebingen.uni.sfs.clarind.readers.CONLLReader;
-import de.tuebingen.uni.sfs.clarind.readers.CONLLToken;
-import de.tuebingen.uni.sfs.clarind.readers.CorpusReader;
-import de.tuebingen.uni.sfs.clarind.sample.ReservoirSampler;
-import de.tuebingen.uni.sfs.clarind.writers.CONLLWriter;
+import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLReader;
+import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLToken;
+import de.tuebingen.uni.sfs.clarind.conllutils.readers.CorpusReader;
+import de.tuebingen.uni.sfs.clarind.conllutils.sample.ReservoirSampler;
+import de.tuebingen.uni.sfs.clarind.conllutils.writers.CONLLWriter;
 import org.apache.commons.cli.*;
 
 import java.io.*;

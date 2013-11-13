@@ -1,6 +1,6 @@
-package de.tuebingen.uni.sfs.clarind.writers;
+package de.tuebingen.uni.sfs.clarind.conllutils.writers;
 
-import de.tuebingen.uni.sfs.clarind.readers.CONLLToken;
+import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLToken;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

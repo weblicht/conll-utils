@@ -1,4 +1,4 @@
-package de.tuebingen.uni.sfs.clarind.readers;
+package de.tuebingen.uni.sfs.clarind.conllutils.readers;
 
 // Copyright 2008, 2013 Daniel de Kok
 //

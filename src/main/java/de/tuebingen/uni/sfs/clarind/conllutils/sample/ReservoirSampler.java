@@ -1,7 +1,7 @@
-package de.tuebingen.uni.sfs.clarind.sample;
+package de.tuebingen.uni.sfs.clarind.conllutils.sample;
 
-import de.tuebingen.uni.sfs.clarind.readers.CONLLToken;
-import de.tuebingen.uni.sfs.clarind.readers.CorpusReader;
+import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLToken;
+import de.tuebingen.uni.sfs.clarind.conllutils.readers.CorpusReader;
 
 import java.io.IOException;
 import java.util.ArrayList;

@@ -1,11 +1,11 @@
-package de.tuebingen.uni.sfs.clarind.tools;
+package de.tuebingen.uni.sfs.clarind.conllutils.tools;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import de.tuebingen.uni.sfs.clarind.readers.CONLLReader;
-import de.tuebingen.uni.sfs.clarind.readers.CONLLToken;
-import de.tuebingen.uni.sfs.clarind.writers.CONLLWriter;
+import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLReader;
+import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLToken;
+import de.tuebingen.uni.sfs.clarind.conllutils.writers.CONLLWriter;
 
 import java.io.*;
 import java.util.List;

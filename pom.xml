@@ -51,7 +51,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>de.tuebingen.uni.sfs.clarind.cli.CONLLUtil</mainClass>
+                            <mainClass>de.tuebingen.uni.sfs.clarind.conllutils.cli.CONLLUtil</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

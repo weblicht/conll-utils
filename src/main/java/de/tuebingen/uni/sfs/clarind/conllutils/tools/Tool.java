@@ -1,4 +1,4 @@
-package de.tuebingen.uni.sfs.clarind.tools;
+package de.tuebingen.uni.sfs.clarind.conllutils.tools;
 
 import java.io.IOException;
 import java.util.List;
