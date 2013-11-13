@@ -1,4 +1,4 @@
-package de.tuebingen.uni.sfs.clarind.conllutils.tools;
+package de.tuebingen.uni.sfs.clarind.conllutils.cli;
 
 import com.google.common.collect.ImmutableList;
 import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLReader;
@@ -9,32 +9,17 @@ import org.apache.commons.cli.*;
 import java.io.*;
 import java.util.List;
 
-public class POSTagTool implements Tool {
-    private static final String TOOL_NAME = "postag";
-    private final String mainName;
+public class POSTag {
+    private static final String PROGRAM_NAME = "postag";
 
-    public POSTagTool(String mainName) {
-        this.mainName = mainName;
-    }
-
-    @Override
-    public String name() {
-        return TOOL_NAME;
-    }
-
-    @Override
-    public void run(List<String> args) throws IOException {
+    public static void main(String[] args) {
         Options options = programOptions();
         CommandLine cmdLine = parseArguments(options, args);
 
         if (cmdLine.getArgs().length != 2)
             usage(options);
 
-        if (!cmdLine.hasOption('c') && !cmdLine.hasOption('f'))
-            throw new IOException("Nothing to do!");
-
-        if (cmdLine.hasOption('c') && cmdLine.hasOption('f'))
-            throw new IOException("Cannot use both coarse-grained and fine-grained tags!");
+        checkArguments(cmdLine);
 
         File inFile = new File(cmdLine.getArgs()[0]);
         File outFile = new File(cmdLine.getArgs()[1]);
@@ -59,30 +44,45 @@ public class POSTagTool implements Tool {
 
                 writer.writeSentence(builder.build());
             }
+        } catch (FileNotFoundException e) {
+            System.err.println(String.format("Cannot open file for reading: %s", inFile));
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
         }
     }
 
-    private CommandLine parseArguments(Options options, List<String> args) {
+    private static void checkArguments(CommandLine cmdLine) {
+        if (!cmdLine.hasOption('c') && !cmdLine.hasOption('f')) {
+            System.err.println("Nothing to do!");
+            System.exit(1);
+        }
+
+        if (cmdLine.hasOption('c') && cmdLine.hasOption('f')) {
+            System.err.println("Cannot use both coarse-grained and fine-grained tags!");
+            System.exit(1);
+        }
+    }
+
+    private static CommandLine parseArguments(Options options, String[] args) {
         Parser parser = new GnuParser();
-        String[] arr = new String[0];
         CommandLine cmdLine = null;
         try {
-            cmdLine = parser.parse(options, args.toArray(arr));
+            cmdLine = parser.parse(options, args);
         } catch (ParseException e) {
             usage(options);
         }
         return cmdLine;
     }
 
-    private Options programOptions() {
+    private static Options programOptions() {
         Options options = new Options();
         options.addOption("c", "coarse", false, "Replace fine-grained postags by coarse-grained");
         options.addOption("f", "fine", false, "Replace coarse-grained postags by fine-grained");
         return options;
     }
 
-    private void usage(Options options) {
-        new HelpFormatter().printHelp(String.format("Usage: %s %s [OPTIONS] CONLL CONLL_OUT", mainName, TOOL_NAME), options);
+    private static void usage(Options options) {
+        new HelpFormatter().printHelp(String.format("Usage: %s [OPTIONS] CONLL CONLL_OUT", PROGRAM_NAME), options);
         System.exit(1);
     }
 }

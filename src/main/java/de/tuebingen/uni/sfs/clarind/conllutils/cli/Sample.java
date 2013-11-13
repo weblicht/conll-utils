@@ -1,4 +1,4 @@
-package de.tuebingen.uni.sfs.clarind.conllutils.tools;
+package de.tuebingen.uni.sfs.clarind.conllutils.cli;
 
 import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLReader;
 import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLToken;
@@ -11,28 +11,10 @@ import java.io.*;
 import java.util.List;
 import java.util.Random;
 
-public class SamplingTool implements Tool {
-    private static final String TOOL_NAME = "sample";
-    private final String mainName;
+public class Sample {
+    private static final String PROGRAM_NAME = "conll-sample";
 
-    public SamplingTool(String mainName) {
-        this.mainName = mainName;
-    }
-
-    @Override
-    public String name() {
-        return TOOL_NAME;
-    }
-
-    private Options programOptions() {
-        Options options = new Options();
-        options.addOption("n", "sample-size", true, "The size of the sample (default: 100)");
-        options.addOption("s", "seed", true, "Seed for the random number generator (default: random)");
-        return options;
-    }
-
-    @Override
-    public void run(List<String> args) throws IOException {
+    public static void main(String[] args) {
         final Options options = programOptions();
         final CommandLine cmdLine = parseArguments(options, args);
 
@@ -43,24 +25,39 @@ public class SamplingTool implements Tool {
         final int sampleSize = cmdLine.hasOption('n') ? Integer.parseInt(cmdLine.getOptionValue('n')) : 100;
         ReservoirSampler sampler = new ReservoirSampler(rng, sampleSize);
 
-        final List<List<CONLLToken>> sample;
-        sample = readAndSample(cmdLine.getArgs()[0], sampler);
-        writeSample(cmdLine.getArgs()[1], sample);
+        List<List<CONLLToken>> sample = null;
+        try {
+            sample = readAndSample(cmdLine.getArgs()[0], sampler);
+        } catch (IOException e) {
+            System.err.println(String.format("Error reading CONLL corpus: %s", e.getMessage()));
+            System.exit(1);
+        }
+        try {
+            writeSample(cmdLine.getArgs()[1], sample);
+        } catch (IOException e) {
+            System.err.println(String.format("Error writing CONLL corpus: %s", e.getMessage()));
+        }
     }
 
-    private CommandLine parseArguments(Options options, List<String> args) {
+    private static CommandLine parseArguments(Options options, String[] args) {
         Parser parser = new GnuParser();
-        String[] arr = new String[0];
         CommandLine cmdLine = null;
         try {
-            cmdLine = parser.parse(options, args.toArray(arr));
+            cmdLine = parser.parse(options, args);
         } catch (ParseException e) {
             usage(options);
         }
         return cmdLine;
     }
 
-    private List<List<CONLLToken>> readAndSample(String filename, ReservoirSampler sampler) throws IOException {
+    private static Options programOptions() {
+        Options options = new Options();
+        options.addOption("n", "sample-size", true, "The size of the sample (default: 100)");
+        options.addOption("s", "seed", true, "Seed for the random number generator (default: random)");
+        return options;
+    }
+
+    private static List<List<CONLLToken>> readAndSample(String filename, ReservoirSampler sampler) throws IOException {
         try (CorpusReader corpusReader = new CONLLReader(new BufferedReader(new FileReader(filename)))) {
             return sampler.sample(corpusReader);
         } catch (FileNotFoundException e) {
@@ -70,7 +67,7 @@ public class SamplingTool implements Tool {
         }
     }
 
-    private void writeSample(String filename, List<List<CONLLToken>> sample) throws IOException {
+    private static void writeSample(String filename, List<List<CONLLToken>> sample) throws IOException {
         try (CONLLWriter writer = new CONLLWriter(new BufferedWriter(new FileWriter(filename)))) {
             for (List<CONLLToken> sentence : sample) {
                 writer.writeSentence(sentence);
@@ -80,8 +77,8 @@ public class SamplingTool implements Tool {
         }
     }
 
-    private void usage(Options options) {
-        new HelpFormatter().printHelp(String.format("Usage: %s %s CONLL CONLL_SAMPLE", mainName, TOOL_NAME), options);
+    private static void usage(Options options) {
+        new HelpFormatter().printHelp(String.format("Usage: %s [OPTION]... CONLL CONLL_SAMPLE", PROGRAM_NAME), options);
         System.exit(1);
     }
 }

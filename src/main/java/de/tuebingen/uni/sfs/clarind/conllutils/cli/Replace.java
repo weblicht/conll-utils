@@ -1,4 +1,4 @@
-package de.tuebingen.uni.sfs.clarind.conllutils.tools;
+package de.tuebingen.uni.sfs.clarind.conllutils.cli;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -8,36 +8,26 @@ import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLToken;
 import de.tuebingen.uni.sfs.clarind.conllutils.writers.CONLLWriter;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Replace a token, lemma, POS-tag, or dependency relation by another.
  */
-public class ReplaceTool implements Tool {
-    private static final String TOOL_NAME = "replace";
-    private final String mainName;
+public class Replace {
+    private static final String PROGRAM_NAME = "replace";
 
-    public ReplaceTool(String mainName) {
-        this.mainName = mainName;
-    }
-
-    @Override
-    public String name() {
-        return TOOL_NAME;
-    }
-
-    @Override
-    public void run(List<String> args) throws IOException {
-        if (args.size() < 3)
+    public static void main(String[] args) {
+        if (args.length < 3)
             usage();
 
-        Layer layer = valueOfLayer(args.get(2));
+        Layer layer = valueOfLayer(args[2]);
 
         Map<String, String> replacements = getReplacements(args);
 
-        try (CONLLReader reader = new CONLLReader(new BufferedReader(new FileReader(args.get(0))));
-             CONLLWriter writer = new CONLLWriter(new BufferedWriter(new FileWriter(args.get(1))))) {
+        try (CONLLReader reader = new CONLLReader(new BufferedReader(new FileReader(args[0])));
+             CONLLWriter writer = new CONLLWriter(new BufferedWriter(new FileWriter(args[1])))) {
             List<CONLLToken> sentence;
             while ((sentence = reader.readSentence()) != null) {
                 ImmutableList.Builder<CONLLToken> sentenceBuilder = ImmutableList.builder();
@@ -66,11 +56,15 @@ public class ReplaceTool implements Tool {
 
                 writer.writeSentence(sentenceBuilder.build());
             }
+        } catch (FileNotFoundException e) {
+            System.err.println(String.format("Could not open for reading: %s", args[0]));
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
         }
     }
 
-    private Map<String, String> getReplacements(List<String> args) {
-        List<String> replacementArgs = args.subList(3, args.size());
+    private static Map<String, String> getReplacements(String[] args) {
+        List<String> replacementArgs = Arrays.asList(args).subList(3, args.length);
         if (replacementArgs.size() % 2 != 0)
             throw new IllegalArgumentException(
                     String.format("Missing replacement for: %s", replacementArgs.get(replacementArgs.size() - 1)));
@@ -82,7 +76,7 @@ public class ReplaceTool implements Tool {
         return builder.build();
     }
 
-    private CONLLToken replaceDepRel(CONLLToken token, Map<String, String> replacements) {
+    private static CONLLToken replaceDepRel(CONLLToken token, Map<String, String> replacements) {
         if (!token.getDepRel().isPresent())
             return token;
 
@@ -95,7 +89,7 @@ public class ReplaceTool implements Tool {
                     Optional.of(replacement), token.getPHead(), token.getPDepRel());
     }
 
-    private CONLLToken replacePOSTag(CONLLToken token, Map<String, String> replacements) {
+    private static CONLLToken replacePOSTag(CONLLToken token, Map<String, String> replacements) {
         if (!token.getPosTag().isPresent())
             return token;
 
@@ -108,7 +102,7 @@ public class ReplaceTool implements Tool {
                     token.getDepRel(), token.getPHead(), token.getPDepRel());
     }
 
-    private CONLLToken replaceLemma(CONLLToken token, Map<String, String> replacements) {
+    private static CONLLToken replaceLemma(CONLLToken token, Map<String, String> replacements) {
         if (!token.getLemma().isPresent())
             return token;
 
@@ -121,7 +115,7 @@ public class ReplaceTool implements Tool {
                     token.getDepRel(), token.getPHead(), token.getPDepRel());
     }
 
-    private CONLLToken replaceToken(CONLLToken token, Map<String, String> replacements) {
+    private static CONLLToken replaceToken(CONLLToken token, Map<String, String> replacements) {
         String replacement = replacements.get(token.getForm());
         if (replacement == null)
             return token;
@@ -131,8 +125,8 @@ public class ReplaceTool implements Tool {
                     token.getPHead(), token.getPDepRel());
     }
 
-    public void usage() {
-        System.err.println(String.format("Usage: %s %s CONLL CONLL_OUTPUT LAYER [FIND REPLACE]...", mainName, TOOL_NAME));
+    public static void usage() {
+        System.err.println(String.format("Usage: %s CONLL CONLL_OUTPUT LAYER [FIND REPLACE]...", PROGRAM_NAME));
         System.exit(1);
     }
 

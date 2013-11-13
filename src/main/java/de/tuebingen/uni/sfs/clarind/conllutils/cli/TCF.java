@@ -1,4 +1,4 @@
-package de.tuebingen.uni.sfs.clarind.conllutils.tools;
+package de.tuebingen.uni.sfs.clarind.conllutils.cli;
 
 import com.google.common.base.Optional;
 import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLReader;
@@ -10,20 +10,10 @@ import org.apache.commons.cli.*;
 import java.io.*;
 import java.util.List;
 
-public class TCFTool implements Tool {
-    private static final String TOOL_NAME = "tcf";
-    private final String mainClass;
+public class TCF {
+    private static final String PROGRAM_NAME = "conll2tcf";
 
-    public TCFTool(String mainClass) {
-        this.mainClass = mainClass;
-    }
-
-    @Override
-    public String name() {
-        return TOOL_NAME;
-    }
-
-    public void run(List<String> args) throws IOException {
+    public static void main(String[] args) {
         Options options = programOptions();
         CommandLine cmdLine = processArgs(options, args);
 
@@ -31,8 +21,10 @@ public class TCFTool implements Tool {
             usage(options);
 
         File conllFile = new File(cmdLine.getArgs()[0]);
-        if (!conllFile.canRead())
-            throw new IOException(String.format("Cannot open file for reading: %s", conllFile.getName()));
+        if (!conllFile.canRead()) {
+            System.err.println(String.format("Cannot open file for reading: %s", conllFile.getName()));
+            System.exit(1);
+        }
 
         File tcfFile = new File(cmdLine.getArgs()[1]);
         String language = cmdLine.hasOption('g') ? cmdLine.getOptionValue('g') : "de";
@@ -46,14 +38,17 @@ public class TCFTool implements Tool {
             while ((sentence = corpusReader.readSentence()) != null) {
                 tcfWriter.writeSentence(sentence);
             }
+        } catch (FileNotFoundException e) {
+            System.err.println(String.format("Cannot open file for reading: %s", conllFile.getName()));
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
         }
     }
 
-    private CommandLine processArgs(Options options, List<String> args) {
+    private static CommandLine processArgs(Options options, String[] args) {
         Parser parser = new GnuParser();
         try {
-            String[] arr = new String[0];
-            return parser.parse(options, args.toArray(arr));
+            return parser.parse(options, args);
         } catch (ParseException e) {
             usage(options);
         }
@@ -61,7 +56,7 @@ public class TCFTool implements Tool {
         return null; // Shouldn't happen.
     }
 
-    private Options programOptions() {
+    private static Options programOptions() {
         Options options = new Options();
         options.addOption("g", "language", true, "The two-letter language code (default: de)");
         options.addOption("d", "dependency", true, "Create dependency layer, with the given tagset");
@@ -70,8 +65,8 @@ public class TCFTool implements Tool {
         return options;
     }
 
-    private void usage(Options options) {
-        new HelpFormatter().printHelp(String.format("%s %s [OPTION]... CONLL TCF", mainClass, TOOL_NAME), options);
+    private static void usage(Options options) {
+        new HelpFormatter().printHelp(String.format("%s [OPTION]... CONLL TCF", PROGRAM_NAME), options);
         System.exit(1);
     }
 
