@@ -4,10 +4,14 @@ import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLReader;
 import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLToken;
 import de.tuebingen.uni.sfs.clarind.conllutils.readers.CorpusReader;
 import de.tuebingen.uni.sfs.clarind.conllutils.sample.ReservoirSampler;
+import de.tuebingen.uni.sfs.clarind.conllutils.util.IOUtils;
 import de.tuebingen.uni.sfs.clarind.conllutils.writers.CONLLWriter;
 import org.apache.commons.cli.*;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
 import java.util.Random;
 
@@ -18,24 +22,21 @@ public class Sample {
         final Options options = programOptions();
         final CommandLine cmdLine = parseArguments(options, args);
 
-        if (cmdLine.getArgs().length != 2)
-            usage(options);
-
         final Random rng = cmdLine.hasOption('s') ? new Random(Long.parseLong(cmdLine.getOptionValue('s'))) : new Random();
         final int sampleSize = cmdLine.hasOption('n') ? Integer.parseInt(cmdLine.getOptionValue('n')) : 100;
         ReservoirSampler sampler = new ReservoirSampler(rng, sampleSize);
 
         List<List<CONLLToken>> sample = null;
-        try {
-            sample = readAndSample(cmdLine.getArgs()[0], sampler);
+        try (CONLLReader reader = new CONLLReader(IOUtils.openArgOrStdin(cmdLine.getArgs(), 0))) {
+            sample = sampler.sample(reader);
         } catch (IOException e) {
             System.err.println(String.format("Error reading CONLL corpus: %s", e.getMessage()));
             System.exit(1);
         }
-        try {
-            writeSample(cmdLine.getArgs()[1], sample);
+        try (CONLLWriter writer = new CONLLWriter(IOUtils.openArgOrStdout(cmdLine.getArgs(), 1))) {
+            writeSample(writer, sample);
         } catch (IOException e) {
-            System.err.println(String.format("Error writing CONLL corpus: %s", e.getMessage()));
+            System.err.println(String.format("Error writing sample: %s", e.getMessage()));
         }
     }
 
@@ -57,28 +58,14 @@ public class Sample {
         return options;
     }
 
-    private static List<List<CONLLToken>> readAndSample(String filename, ReservoirSampler sampler) throws IOException {
-        try (CorpusReader corpusReader = new CONLLReader(new BufferedReader(new FileReader(filename)))) {
-            return sampler.sample(corpusReader);
-        } catch (FileNotFoundException e) {
-            throw new IOException(String.format("Could not open corpus for reading: %s", filename));
-        } catch (IOException e) {
-            throw new IOException(String.format("Error while reading: %s", filename));
-        }
-    }
-
-    private static void writeSample(String filename, List<List<CONLLToken>> sample) throws IOException {
-        try (CONLLWriter writer = new CONLLWriter(new BufferedWriter(new FileWriter(filename)))) {
-            for (List<CONLLToken> sentence : sample) {
-                writer.writeSentence(sentence);
-            }
-        } catch (Exception e) {
-            throw new IOException(String.format("Error writing sample: %s (%s)", filename, e.getMessage()));
+    private static void writeSample(CONLLWriter writer, List<List<CONLLToken>> sample) throws IOException {
+        for (List<CONLLToken> sentence : sample) {
+            writer.writeSentence(sentence);
         }
     }
 
     private static void usage(Options options) {
-        new HelpFormatter().printHelp(String.format("Usage: %s [OPTION]... CONLL CONLL_SAMPLE", PROGRAM_NAME), options);
+        new HelpFormatter().printHelp(String.format("Usage: %s [OPTION]... [CONLL] [CONLL_SAMPLE]", PROGRAM_NAME), options);
         System.exit(1);
     }
 }

@@ -4,10 +4,13 @@ import com.google.common.base.Optional;
 import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLReader;
 import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLToken;
 import de.tuebingen.uni.sfs.clarind.conllutils.readers.CorpusReader;
+import de.tuebingen.uni.sfs.clarind.conllutils.util.IOUtils;
 import de.tuebingen.uni.sfs.clarind.conllutils.writers.TCFWriter;
 import org.apache.commons.cli.*;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 
 public class TCF {
@@ -17,29 +20,18 @@ public class TCF {
         Options options = programOptions();
         CommandLine cmdLine = processArgs(options, args);
 
-        if (cmdLine.getArgList().size() != 2)
-            usage(options);
-
-        File conllFile = new File(cmdLine.getArgs()[0]);
-        if (!conllFile.canRead()) {
-            System.err.println(String.format("Cannot open file for reading: %s", conllFile.getName()));
-            System.exit(1);
-        }
-
-        File tcfFile = new File(cmdLine.getArgs()[1]);
         String language = cmdLine.hasOption('g') ? cmdLine.getOptionValue('g') : "de";
         boolean lemmas = cmdLine.hasOption('l');
         Optional<String> posTagset = Optional.fromNullable(cmdLine.getOptionValue('p'));
         Optional<String> dependencyTagset = Optional.fromNullable(cmdLine.getOptionValue('d'));
 
-        try (CorpusReader corpusReader = new CONLLReader(new BufferedReader(new FileReader(conllFile)));
-             TCFWriter tcfWriter = new TCFWriter(new FileWriter(tcfFile), language, lemmas, posTagset, dependencyTagset)) {
+        try (CorpusReader corpusReader = new CONLLReader(IOUtils.openArgOrStdin(cmdLine.getArgs(), 0));
+             TCFWriter tcfWriter = new TCFWriter(IOUtils.openArgOrStdout(cmdLine.getArgs(), 1), language,
+                     lemmas, posTagset, dependencyTagset)) {
             List<CONLLToken> sentence;
             while ((sentence = corpusReader.readSentence()) != null) {
                 tcfWriter.writeSentence(sentence);
             }
-        } catch (FileNotFoundException e) {
-            System.err.println(String.format("Cannot open file for reading: %s", conllFile.getName()));
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }

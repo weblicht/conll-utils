@@ -3,6 +3,7 @@ package de.tuebingen.uni.sfs.clarind.conllutils.cli;
 import com.google.common.collect.ImmutableList;
 import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLReader;
 import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLToken;
+import de.tuebingen.uni.sfs.clarind.conllutils.util.IOUtils;
 import de.tuebingen.uni.sfs.clarind.conllutils.writers.CONLLWriter;
 import org.apache.commons.cli.*;
 
@@ -16,17 +17,10 @@ public class POSTag {
         Options options = programOptions();
         CommandLine cmdLine = parseArguments(options, args);
 
-        if (cmdLine.getArgs().length != 2)
-            usage(options);
-
         checkArguments(cmdLine);
 
-        File inFile = new File(cmdLine.getArgs()[0]);
-        File outFile = new File(cmdLine.getArgs()[1]);
-
-
-        try (CONLLReader reader = new CONLLReader(new BufferedReader(new FileReader(inFile)));
-             CONLLWriter writer = new CONLLWriter(new BufferedWriter(new FileWriter(outFile)))) {
+        try (CONLLReader reader = new CONLLReader(IOUtils.openArgOrStdin(cmdLine.getArgs(), 0));
+             CONLLWriter writer = new CONLLWriter(IOUtils.openArgOrStdout(cmdLine.getArgs(), 1))) {
             List<CONLLToken> sentence;
             while ((sentence = reader.readSentence()) != null) {
                 ImmutableList.Builder<CONLLToken> builder = ImmutableList.builder();
@@ -44,8 +38,6 @@ public class POSTag {
 
                 writer.writeSentence(builder.build());
             }
-        } catch (FileNotFoundException e) {
-            System.err.println(String.format("Cannot open file for reading: %s", inFile));
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }
@@ -82,7 +74,7 @@ public class POSTag {
     }
 
     private static void usage(Options options) {
-        new HelpFormatter().printHelp(String.format("Usage: %s [OPTIONS] CONLL CONLL_OUT", PROGRAM_NAME), options);
+        new HelpFormatter().printHelp(String.format("Usage: %s [OPTIONS] [CONLL] [CONLL_OUT]", PROGRAM_NAME), options);
         System.exit(1);
     }
 }

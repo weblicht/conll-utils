@@ -5,7 +5,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLReader;
 import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLToken;
+import de.tuebingen.uni.sfs.clarind.conllutils.util.IOUtils;
 import de.tuebingen.uni.sfs.clarind.conllutils.writers.CONLLWriter;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
 import java.util.Arrays;
@@ -19,15 +21,15 @@ public class Replace {
     private static final String PROGRAM_NAME = "replace";
 
     public static void main(String[] args) {
-        if (args.length < 3)
+        if (args.length < 2)
             usage();
 
-        Layer layer = valueOfLayer(args[2]);
+        Layer layer = valueOfLayer(args[1]);
 
-        Map<String, String> replacements = getReplacements(args);
+        Map<String, String> replacements = getReplacements(args[0]);
 
-        try (CONLLReader reader = new CONLLReader(new BufferedReader(new FileReader(args[0])));
-             CONLLWriter writer = new CONLLWriter(new BufferedWriter(new FileWriter(args[1])))) {
+        try (CONLLReader reader = new CONLLReader(IOUtils.openArgOrStdin(args, 2));
+             CONLLWriter writer = new CONLLWriter(IOUtils.openArgOrStdout(args, 3))) {
             List<CONLLToken> sentence;
             while ((sentence = reader.readSentence()) != null) {
                 ImmutableList.Builder<CONLLToken> sentenceBuilder = ImmutableList.builder();
@@ -63,15 +65,16 @@ public class Replace {
         }
     }
 
-    private static Map<String, String> getReplacements(String[] args) {
-        List<String> replacementArgs = Arrays.asList(args).subList(3, args.length);
-        if (replacementArgs.size() % 2 != 0)
-            throw new IllegalArgumentException(
-                    String.format("Missing replacement for: %s", replacementArgs.get(replacementArgs.size() - 1)));
-
+    private static Map<String, String> getReplacements(String replacementsString) {
         ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
-        for (int i = 0; i < replacementArgs.size(); i += 2)
-            builder.put(replacementArgs.get(i), replacementArgs.get(i + 1));
+
+        for (String replacementString: StringUtils.split(replacementsString, ',')) {
+            String[] parts = StringUtils.split(replacementString, ':');
+            if (parts.length != 2)
+                throw new IllegalArgumentException(String.format("Replacement should be of the form 'ORIG:NEW': %s", replacementString));
+
+            builder.put(parts[0], parts[1]);
+        }
 
         return builder.build();
     }
@@ -126,7 +129,7 @@ public class Replace {
     }
 
     public static void usage() {
-        System.err.println(String.format("Usage: %s CONLL CONLL_OUTPUT LAYER [FIND REPLACE]...", PROGRAM_NAME));
+        System.err.println(String.format("Usage: %s FIND:REPLACE[,FIND:REPLACE]... LAYER [CONLL] [CONLL_OUTPUT]", PROGRAM_NAME));
         System.exit(1);
     }
 
