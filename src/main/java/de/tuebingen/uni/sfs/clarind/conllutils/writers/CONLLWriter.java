@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Writer for CONLL dependency, lemma and part-of-speech tag corpora.
  */
-public class CONLLWriter implements CorpusWriter {
+public class CONLLWriter extends AbstractCorpusWriter {
     private final BufferedWriter writer;
     private boolean firstSentence;
 
@@ -20,7 +20,7 @@ public class CONLLWriter implements CorpusWriter {
     }
 
     @Override
-    public void writeSentence(Sentence sentence) throws IOException {
+    public void write(Sentence sentence) throws IOException {
         if (firstSentence)
             firstSentence = false;
         else

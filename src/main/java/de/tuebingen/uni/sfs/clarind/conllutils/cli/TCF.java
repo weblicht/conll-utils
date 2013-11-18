@@ -2,17 +2,12 @@ package de.tuebingen.uni.sfs.clarind.conllutils.cli;
 
 import com.google.common.base.Optional;
 import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLReader;
-import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLToken;
 import de.tuebingen.uni.sfs.clarind.conllutils.readers.CorpusReader;
-import de.tuebingen.uni.sfs.clarind.conllutils.readers.Sentence;
 import de.tuebingen.uni.sfs.clarind.conllutils.util.IOUtils;
 import de.tuebingen.uni.sfs.clarind.conllutils.writers.TCFWriter;
 import org.apache.commons.cli.*;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.List;
 
 public class TCF {
     private static final String PROGRAM_NAME = "conll2tcf";
@@ -26,13 +21,10 @@ public class TCF {
         Optional<String> posTagset = Optional.fromNullable(cmdLine.getOptionValue('p'));
         Optional<String> dependencyTagset = Optional.fromNullable(cmdLine.getOptionValue('d'));
 
-        try (CorpusReader corpusReader = new CONLLReader(IOUtils.openArgOrStdin(cmdLine.getArgs(), 0));
+        try (CorpusReader conllReader = new CONLLReader(IOUtils.openArgOrStdin(cmdLine.getArgs(), 0));
              TCFWriter tcfWriter = new TCFWriter(IOUtils.openArgOrStdout(cmdLine.getArgs(), 1), language,
                      lemmas, posTagset, dependencyTagset)) {
-            Sentence sentence;
-            while ((sentence = corpusReader.readSentence()) != null) {
-                tcfWriter.writeSentence(sentence);
-            }
+            tcfWriter.write(conllReader);
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }

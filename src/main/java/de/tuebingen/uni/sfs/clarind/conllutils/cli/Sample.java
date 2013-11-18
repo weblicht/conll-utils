@@ -6,9 +6,6 @@ import de.tuebingen.uni.sfs.clarind.conllutils.util.IOUtils;
 import de.tuebingen.uni.sfs.clarind.conllutils.writers.CONLLWriter;
 import org.apache.commons.cli.*;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 import java.util.Random;
@@ -58,7 +55,7 @@ public class Sample {
 
     private static void writeSample(CONLLWriter writer, List<List<CONLLToken>> sample) throws IOException {
         for (List<CONLLToken> sentence : sample) {
-            writer.writeSentence(new PlainSentence(sentence));
+            writer.write(new PlainSentence(sentence));
         }
     }
 

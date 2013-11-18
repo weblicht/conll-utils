@@ -12,8 +12,6 @@ import de.tuebingen.uni.sfs.clarind.conllutils.writers.CONLLWriter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -58,7 +56,7 @@ public class Replace {
                     sentenceBuilder.add(newToken);
                 }
 
-                writer.writeSentence(new PlainSentence(sentenceBuilder.build()));
+                writer.write(new PlainSentence(sentenceBuilder.build()));
             }
         } catch (FileNotFoundException e) {
             System.err.println(String.format("Could not open for reading: %s", args[0]));

@@ -10,7 +10,6 @@ import de.tuebingen.uni.sfs.clarind.conllutils.writers.CONLLWriter;
 import org.apache.commons.cli.*;
 
 import java.io.*;
-import java.util.List;
 
 public class POSTag {
     private static final String PROGRAM_NAME = "postag";
@@ -38,7 +37,7 @@ public class POSTag {
                                 token.getDepRel(), token.getPHead(), token.getPDepRel()));
                 }
 
-                writer.writeSentence(new PlainSentence(builder.build()));
+                writer.write(new PlainSentence(builder.build()));
             }
         } catch (IOException e) {
             System.err.println(e.getMessage());

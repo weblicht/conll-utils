@@ -20,7 +20,7 @@ import java.util.List;
  *
  * @author Daniël de Kok
  */
-public class TCFWriter implements CorpusWriter {
+public class TCFWriter extends AbstractCorpusWriter {
     private final Writer corpusWriter;
     private final TextCorpusStored corpus;
     private final SentencesLayer sentencesLayer;
@@ -42,7 +42,7 @@ public class TCFWriter implements CorpusWriter {
     }
 
     @Override
-    public void writeSentence(de.tuebingen.uni.sfs.clarind.conllutils.readers.Sentence sentence) throws IOException {
+    public void write(de.tuebingen.uni.sfs.clarind.conllutils.readers.Sentence sentence) throws IOException {
         List<PositionDependency> positionDependencies = new LinkedList<>();
 
         List<Token> tokens = new ArrayList<>();
