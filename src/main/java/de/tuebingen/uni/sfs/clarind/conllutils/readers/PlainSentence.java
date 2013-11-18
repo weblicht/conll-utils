@@ -23,4 +23,21 @@ public class PlainSentence implements Sentence {
     public String toString() {
         return StringUtils.join(tokens, '\n');
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        PlainSentence that = (PlainSentence) o;
+
+        if (tokens != null ? !tokens.equals(that.tokens) : that.tokens != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return tokens != null ? tokens.hashCode() : 0;
+    }
 }
