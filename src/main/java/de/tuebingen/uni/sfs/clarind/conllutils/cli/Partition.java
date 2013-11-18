@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Program to create folds of CONLL data.
  */
-public class Folds {
+public class Partition {
     public static void main(String[] args) throws IOException {
         if (args.length < 3)
             usage();
@@ -41,7 +41,7 @@ public class Folds {
     }
 
     private static void usage() {
-        System.err.println("Usage: conll-folds N prefix suffix [CONLL]");
+        System.err.println("Usage: conll-partition N prefix suffix [CONLL]");
         System.exit(1);
     }
 }

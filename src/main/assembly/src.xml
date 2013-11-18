@@ -19,7 +19,7 @@
             <outputDirectory>/bin</outputDirectory>
             <includes>
                 <include>conll2tcf</include>
-                <include>conll-folds</include>
+                <include>conll-partition</include>
                 <include>conll-postag</include>
                 <include>conll-replace</include>
                 <include>conll-sample</include>
