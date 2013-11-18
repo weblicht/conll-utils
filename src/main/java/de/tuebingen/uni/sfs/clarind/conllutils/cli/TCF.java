@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLReader;
 import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLToken;
 import de.tuebingen.uni.sfs.clarind.conllutils.readers.CorpusReader;
+import de.tuebingen.uni.sfs.clarind.conllutils.readers.Sentence;
 import de.tuebingen.uni.sfs.clarind.conllutils.util.IOUtils;
 import de.tuebingen.uni.sfs.clarind.conllutils.writers.TCFWriter;
 import org.apache.commons.cli.*;
@@ -28,7 +29,7 @@ public class TCF {
         try (CorpusReader corpusReader = new CONLLReader(IOUtils.openArgOrStdin(cmdLine.getArgs(), 0));
              TCFWriter tcfWriter = new TCFWriter(IOUtils.openArgOrStdout(cmdLine.getArgs(), 1), language,
                      lemmas, posTagset, dependencyTagset)) {
-            List<CONLLToken> sentence;
+            Sentence sentence;
             while ((sentence = corpusReader.readSentence()) != null) {
                 tcfWriter.writeSentence(sentence);
             }

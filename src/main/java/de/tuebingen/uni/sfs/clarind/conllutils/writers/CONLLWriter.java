@@ -1,6 +1,7 @@
 package de.tuebingen.uni.sfs.clarind.conllutils.writers;
 
 import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLToken;
+import de.tuebingen.uni.sfs.clarind.conllutils.readers.Sentence;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -19,13 +20,13 @@ public class CONLLWriter implements CorpusWriter {
     }
 
     @Override
-    public void writeSentence(List<CONLLToken> sentence) throws IOException {
+    public void writeSentence(Sentence sentence) throws IOException {
         if (firstSentence)
             firstSentence = false;
         else
             writer.write("\n");
 
-        for (CONLLToken token : sentence)
+        for (CONLLToken token : sentence.getTokens())
             writer.write(String.format("%s\n", token));
     }
 

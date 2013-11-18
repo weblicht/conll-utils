@@ -1,6 +1,7 @@
 package de.tuebingen.uni.sfs.clarind.conllutils.writers;
 
 import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLToken;
+import de.tuebingen.uni.sfs.clarind.conllutils.readers.Sentence;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -16,5 +17,5 @@ public interface CorpusWriter extends Closeable {
      * @param sentence The sentence.
      * @throws IOException If the sentence could not be written.
      */
-    public void writeSentence(List<CONLLToken> sentence) throws IOException;
+    public void writeSentence(Sentence sentence) throws IOException;
 }

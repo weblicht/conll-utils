@@ -1,7 +1,7 @@
 package de.tuebingen.uni.sfs.clarind.conllutils.writers;
 
 import com.google.common.base.Optional;
-import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLToken;
+import de.tuebingen.uni.sfs.clarind.conllutils.readers.*;
 import eu.clarin.weblicht.wlfxb.tc.api.*;
 import eu.clarin.weblicht.wlfxb.tc.xb.TextCorpusStored;
 import eu.clarin.weblicht.wlfxb.xb.WLData;
@@ -42,12 +42,12 @@ public class TCFWriter implements CorpusWriter {
     }
 
     @Override
-    public void writeSentence(List<CONLLToken> sentence) throws IOException {
+    public void writeSentence(de.tuebingen.uni.sfs.clarind.conllutils.readers.Sentence sentence) throws IOException {
         List<PositionDependency> positionDependencies = new LinkedList<>();
 
         List<Token> tokens = new ArrayList<>();
 
-        for (CONLLToken taggedToken : sentence) {
+        for (CONLLToken taggedToken : sentence.getTokens()) {
             Token token = tokensLayer.addToken(taggedToken.getForm());
             tokens.add(token);
 

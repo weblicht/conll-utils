@@ -2,6 +2,7 @@ package de.tuebingen.uni.sfs.clarind.conllutils.sample;
 
 import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLToken;
 import de.tuebingen.uni.sfs.clarind.conllutils.readers.CorpusReader;
+import de.tuebingen.uni.sfs.clarind.conllutils.readers.Sentence;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,17 +27,17 @@ public class ReservoirSampler {
     public List<List<CONLLToken>> sample(CorpusReader reader) throws IOException {
         List<List<CONLLToken>> sentences = new ArrayList<>(sampleSize);
 
-        List<CONLLToken> sentence;
+        Sentence sentence;
         int idx = 0;
         while ((sentence = reader.readSentence()) != null) {
             if (sentences.size() < sampleSize)
-                sentences.add(sentence);
+                sentences.add(sentence.getTokens());
             else {
                 // nextInt is exclusive, but a 'swap' with itself is also possible.
                 int newPosition = rng.nextInt(idx + 1);
 
                 if (newPosition < sampleSize)
-                    sentences.set(newPosition, sentence);
+                    sentences.set(newPosition, sentence.getTokens());
             }
 
             ++idx;

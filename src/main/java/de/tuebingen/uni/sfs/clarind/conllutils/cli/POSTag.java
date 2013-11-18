@@ -3,6 +3,8 @@ package de.tuebingen.uni.sfs.clarind.conllutils.cli;
 import com.google.common.collect.ImmutableList;
 import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLReader;
 import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLToken;
+import de.tuebingen.uni.sfs.clarind.conllutils.readers.PlainSentence;
+import de.tuebingen.uni.sfs.clarind.conllutils.readers.Sentence;
 import de.tuebingen.uni.sfs.clarind.conllutils.util.IOUtils;
 import de.tuebingen.uni.sfs.clarind.conllutils.writers.CONLLWriter;
 import org.apache.commons.cli.*;
@@ -21,11 +23,11 @@ public class POSTag {
 
         try (CONLLReader reader = new CONLLReader(IOUtils.openArgOrStdin(cmdLine.getArgs(), 0));
              CONLLWriter writer = new CONLLWriter(IOUtils.openArgOrStdout(cmdLine.getArgs(), 1))) {
-            List<CONLLToken> sentence;
+            Sentence sentence;
             while ((sentence = reader.readSentence()) != null) {
                 ImmutableList.Builder<CONLLToken> builder = ImmutableList.builder();
 
-                for (CONLLToken token : sentence) {
+                for (CONLLToken token : sentence.getTokens()) {
                     if (cmdLine.hasOption('c'))
                         builder.add(new CONLLToken(token.getPosition(), token.getForm(), token.getLemma(),
                                 token.getCoursePOSTag(), token.getCoursePOSTag(), token.getFeatures(), token.getHead(),
@@ -36,7 +38,7 @@ public class POSTag {
                                 token.getDepRel(), token.getPHead(), token.getPDepRel()));
                 }
 
-                writer.writeSentence(builder.build());
+                writer.writeSentence(new PlainSentence(builder.build()));
             }
         } catch (IOException e) {
             System.err.println(e.getMessage());

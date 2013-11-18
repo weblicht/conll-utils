@@ -1,8 +1,6 @@
 package de.tuebingen.uni.sfs.clarind.conllutils.cli;
 
-import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLReader;
-import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLToken;
-import de.tuebingen.uni.sfs.clarind.conllutils.readers.CorpusReader;
+import de.tuebingen.uni.sfs.clarind.conllutils.readers.*;
 import de.tuebingen.uni.sfs.clarind.conllutils.sample.ReservoirSampler;
 import de.tuebingen.uni.sfs.clarind.conllutils.util.IOUtils;
 import de.tuebingen.uni.sfs.clarind.conllutils.writers.CONLLWriter;
@@ -60,7 +58,7 @@ public class Sample {
 
     private static void writeSample(CONLLWriter writer, List<List<CONLLToken>> sample) throws IOException {
         for (List<CONLLToken> sentence : sample) {
-            writer.writeSentence(sentence);
+            writer.writeSentence(new PlainSentence(sentence));
         }
     }
 

@@ -5,6 +5,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLReader;
 import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLToken;
+import de.tuebingen.uni.sfs.clarind.conllutils.readers.PlainSentence;
+import de.tuebingen.uni.sfs.clarind.conllutils.readers.Sentence;
 import de.tuebingen.uni.sfs.clarind.conllutils.util.IOUtils;
 import de.tuebingen.uni.sfs.clarind.conllutils.writers.CONLLWriter;
 import org.apache.commons.lang3.StringUtils;
@@ -30,11 +32,11 @@ public class Replace {
 
         try (CONLLReader reader = new CONLLReader(IOUtils.openArgOrStdin(args, 2));
              CONLLWriter writer = new CONLLWriter(IOUtils.openArgOrStdout(args, 3))) {
-            List<CONLLToken> sentence;
+            Sentence sentence;
             while ((sentence = reader.readSentence()) != null) {
                 ImmutableList.Builder<CONLLToken> sentenceBuilder = ImmutableList.builder();
 
-                for (CONLLToken token : sentence) {
+                for (CONLLToken token : sentence.getTokens()) {
                     CONLLToken newToken;
                     switch (layer) {
                         case TOKEN:
@@ -56,7 +58,7 @@ public class Replace {
                     sentenceBuilder.add(newToken);
                 }
 
-                writer.writeSentence(sentenceBuilder.build());
+                writer.writeSentence(new PlainSentence(sentenceBuilder.build()));
             }
         } catch (FileNotFoundException e) {
             System.err.println(String.format("Could not open for reading: %s", args[0]));

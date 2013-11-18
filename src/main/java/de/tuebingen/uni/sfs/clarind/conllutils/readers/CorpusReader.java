@@ -26,5 +26,5 @@ public interface CorpusReader extends Closeable {
      * @return A list of tokens with tags, or <tt>null</tt> if the reader is exhausted.
      * @throws java.io.IOException
      */
-    public List<CONLLToken> readSentence() throws IOException;
+    public Sentence readSentence() throws IOException;
 }

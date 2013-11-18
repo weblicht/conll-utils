@@ -60,17 +60,17 @@ public class CONLLReader implements CorpusReader {
     }
 
     @Override
-    public List<CONLLToken> readSentence() throws IOException {
-        List<CONLLToken> sentence = new ArrayList<>(startMarkers);
+    public Sentence readSentence() throws IOException {
+        List<CONLLToken> tokens = new ArrayList<>(startMarkers);
 
         String line;
         while ((line = reader.readLine()) != null) {
             String parts[] = StringUtils.split(line.trim(), '\t');
 
-            // We are done with this sentence.
+            // We are done with these tokens.
             if (parts.length == 0) {
-                sentence.addAll(endMarkers);
-                return sentence;
+                tokens.addAll(endMarkers);
+                return new PlainSentence(tokens);
             }
 
             if (parts.length < 2)
@@ -78,7 +78,7 @@ public class CONLLReader implements CorpusReader {
 
             String form = parts[1];
 
-            if (decapitalizeFirstWord && sentence.size() == startMarkers.size())
+            if (decapitalizeFirstWord && tokens.size() == startMarkers.size())
                 form = replaceCharAt(form, 0, Character.toLowerCase(form.charAt(0)));
 
             Integer tokenId = Integer.parseInt(parts[0]);
@@ -94,13 +94,13 @@ public class CONLLReader implements CorpusReader {
             CONLLToken conllToken = new CONLLToken(tokenId, form, lemma, courseTag, tag, features, head, headRel,
                     pHead, pHeadRel);
 
-            sentence.add(conllToken);
+            tokens.add(conllToken);
         }
 
         // If the the file does not end with a blank line, we have left-overs.
-        if (sentence.size() != startMarkers.size()) {
-            sentence.addAll(endMarkers);
-            return sentence;
+        if (tokens.size() != startMarkers.size()) {
+            tokens.addAll(endMarkers);
+            return new PlainSentence(tokens);
         }
 
         return null;
