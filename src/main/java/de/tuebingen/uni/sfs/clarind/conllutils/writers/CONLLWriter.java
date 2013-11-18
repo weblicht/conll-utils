@@ -1,11 +1,9 @@
 package de.tuebingen.uni.sfs.clarind.conllutils.writers;
 
-import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLToken;
 import de.tuebingen.uni.sfs.clarind.conllutils.readers.Sentence;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Writer for CONLL dependency, lemma and part-of-speech tag corpora.
@@ -26,8 +24,8 @@ public class CONLLWriter extends AbstractCorpusWriter {
         else
             writer.write("\n");
 
-        for (CONLLToken token : sentence.getTokens())
-            writer.write(String.format("%s\n", token));
+        writer.write(sentence.toString());
+        writer.write('\n');
     }
 
     @Override
