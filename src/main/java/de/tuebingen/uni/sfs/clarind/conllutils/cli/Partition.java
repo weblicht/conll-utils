@@ -31,12 +31,15 @@ public class Partition {
                     writer.close();
 
                 System.err.println(e.getMessage());
+                System.exit(1);
             }
         }
 
         try (CONLLReader reader = new CONLLReader(IOUtils.openArgOrStdin(args, 3));
              PartitioningWriter writer = new PartitioningWriter(writers)) {
             writer.write(reader);
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
         }
     }
 
