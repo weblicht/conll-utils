@@ -1,7 +1,6 @@
 package de.tuebingen.uni.sfs.clarind.conllutils.writers;
 
 import com.google.common.collect.ImmutableList;
-import de.tuebingen.uni.sfs.clarind.conllutils.readers.CorpusReader;
 import de.tuebingen.uni.sfs.clarind.conllutils.readers.Sentence;
 
 import java.io.IOException;
@@ -10,15 +9,15 @@ import java.util.List;
 /**
  * This writer writes sentences to one or more {@link CorpusWriter}s. It can
  * be used to prepare data for e.g. n-fold cross-validation. The sentences are
- * written in an intersection fashion. E.g. if there are two writers, the
- * distribution is as follows:
- *
+ * written in an interspersed. E.g. if there are two writers, the distribution
+ * is as follows:
+ * <p/>
  * <ul>
- *     <li>Sentence 1 → writer 1</li>
- *     <li>Sentence 2 → writer 2</li>
- *     <li>Sentence 3 → writer 1</li>
- *     <li>Sentence 4 → writer 2</li>
- *     <li>Etc.</li>
+ * <li>Sentence 1 → writer 1</li>
+ * <li>Sentence 2 → writer 2</li>
+ * <li>Sentence 3 → writer 1</li>
+ * <li>Sentence 4 → writer 2</li>
+ * <li>Etc.</li>
  * </ul>
  */
 public class PartitioningWriter extends AbstractCorpusWriter {
@@ -30,6 +29,7 @@ public class PartitioningWriter extends AbstractCorpusWriter {
     /**
      * Construct a {@link PartitioningWriter} using a list of writers. The list should
      * contain at least one element. Sentences are distributed among these writers.
+     *
      * @param writers The writers.
      */
     public PartitioningWriter(List<CorpusWriter> writers) {
