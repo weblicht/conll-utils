@@ -32,3 +32,20 @@ seed:
 
   conll-sample -s 42 -n 100 eval.conll | conll2tcf > eval-200.tcf
 
+## Partitioning data
+
+For some tasks (e.g. training the Malt parser) the complete set of
+sentences of a corpus may be to large. The corpus can be partitioned
+such that each partition contains (nearly) the same number of sentences
+and contains sentences spread throughout the corpus. For instance,
+to split a corpus in five parts:
+
+  conll-partition 5 part .conll r9+lemmas-82043.conll
+
+The first argument specifies the number of partitions. The second argument
+the prefix of each partition file and the second argument the suffix. So,
+this command will create the files *part1.conll, ..., part5.conll*. Of
+course, this command can also read from the standard input. E.g.:
+
+ conll-replace PROP:PROAV,PIDAT:PIAT postag r9+lemmas-82043.conll | \
+     conll-postag -f | conll-partition 5 part .conll
