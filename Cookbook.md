@@ -7,11 +7,11 @@ Required steps:
 * Replace the PROP tag by PROAV.
 * Replace the PIDAT tag by PIAT.
 * Don't use coarse-grained tags.
+* Remove the features column.
 
 Command:
   conll-replace PROP:PROAV,PIDAT:PIAT postag r9+lemmas-82043.conll | \
-    conll-postag -f > r9+lemmas-82043-onlp-malt.conll
-
+    conll-postag -f | conll-replace ".*:_" FEATURES > r9+lemmas-82043-onlp-malt.conll
 
 ## Prepare a sample for manual evaluation
 
