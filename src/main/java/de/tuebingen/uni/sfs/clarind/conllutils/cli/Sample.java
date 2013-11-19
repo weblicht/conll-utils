@@ -19,17 +19,18 @@ public class Sample {
 
         final Random rng = cmdLine.hasOption('s') ? new Random(Long.parseLong(cmdLine.getOptionValue('s'))) : new Random();
         final int sampleSize = cmdLine.hasOption('n') ? Integer.parseInt(cmdLine.getOptionValue('n')) : 100;
-        ReservoirSampler sampler = new ReservoirSampler(rng, sampleSize);
+        ReservoirSampler<List<CONLLToken>> sampler = new ReservoirSampler<>(rng, sampleSize);
 
-        List<List<CONLLToken>> sample = null;
         try (CONLLReader reader = new CONLLReader(IOUtils.openArgOrStdin(cmdLine.getArgs(), 0))) {
-            sample = sampler.sample(reader);
+            Sentence sentence;
+            while ((sentence = reader.readSentence()) != null)
+                sampler.add(sentence.getTokens());
         } catch (IOException e) {
             System.err.println(String.format("Error reading CONLL corpus: %s", e.getMessage()));
             System.exit(1);
         }
         try (CONLLWriter writer = new CONLLWriter(IOUtils.openArgOrStdout(cmdLine.getArgs(), 1))) {
-            writeSample(writer, sample);
+            writeSample(writer, sampler.getSample());
         } catch (IOException e) {
             System.err.println(String.format("Error writing sample: %s", e.getMessage()));
         }
