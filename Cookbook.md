@@ -54,5 +54,5 @@ the prefix of each partition file and the second argument the suffix. So,
 this command will create the files *part1.conll, ..., part5.conll*. Of
 course, this command can also read from the standard input. E.g.:
 
-   conll-replace PROP:PROAV,PIDAT:PIAT postag r9+lemmas-82043.conll | \
-     conll-postag -f | conll-partition 5 part .conll
+    conll-replace PROP:PROAV,PIDAT:PIAT postag r9+lemmas-82043.conll | \
+      conll-postag -f | conll-partition 5 part .conll
