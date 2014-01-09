@@ -5,9 +5,11 @@ import de.tuebingen.uni.sfs.clarind.conllutils.readers.TCFReader;
 import de.tuebingen.uni.sfs.clarind.conllutils.util.IOUtils;
 import de.tuebingen.uni.sfs.clarind.conllutils.writers.CONLLWriter;
 import eu.clarin.weblicht.wlfxb.io.WLFormatException;
+import eu.clarin.weblicht.wlfxb.tc.xb.TextCorpusLayerTag;
 import org.apache.commons.cli.*;
 
 import java.io.IOException;
+import java.util.EnumSet;
 
 /**
  * @author Daniël de Kok <me@danieldk.eu>
@@ -19,12 +21,16 @@ public class TCF2CONLL {
         Options options = programOptions();
         CommandLine cmdLine = processArgs(options, args);
 
-        //String language = cmdLine.hasOption('g') ? cmdLine.getOptionValue('g') : "de";
-        //boolean lemmas = cmdLine.hasOption('l');
-        //Optional<String> posTagset = Optional.fromNullable(cmdLine.getOptionValue('p'));
-        //Optional<String> dependencyTagset = Optional.fromNullable(cmdLine.getOptionValue('d'));
+        EnumSet<TextCorpusLayerTag> layersToRead = EnumSet.of(TextCorpusLayerTag.SENTENCES, TextCorpusLayerTag.TOKENS);
 
-        try (CorpusReader tcfReader = new TCFReader(IOUtils.openArgOrStdinStream(cmdLine.getArgs(), 0));
+        if (cmdLine.hasOption("dependency"))
+            layersToRead.add(TextCorpusLayerTag.PARSING_DEPENDENCY);
+        if (cmdLine.hasOption("postag"))
+            layersToRead.add(TextCorpusLayerTag.POSTAGS);
+        if (cmdLine.hasOption("morphology"))
+            layersToRead.add(TextCorpusLayerTag.MORPHOLOGY);
+
+        try (CorpusReader tcfReader = new TCFReader(IOUtils.openArgOrStdinStream(cmdLine.getArgs(), 0), layersToRead);
              CONLLWriter conllWriter = new CONLLWriter(IOUtils.openArgOrStdout(cmdLine.getArgs(), 1))) {
             conllWriter.write(tcfReader);
         } catch (IOException | WLFormatException e) {
@@ -45,9 +51,9 @@ public class TCF2CONLL {
 
     private static Options programOptions() {
         Options options = new Options();
-        options.addOption("d", "dependency", true, "Read dependency layer");
-        options.addOption("p", "postag", true, "Read POS tag layer");
-        options.addOption("m", "morphology", true, "Read morphology layer");
+        options.addOption("d", "dependency", false, "Read dependency layer");
+        options.addOption("p", "postag", false, "Read POS tag layer");
+        options.addOption("m", "morphology", false, "Read morphology layer");
         return options;
     }
 

@@ -32,9 +32,7 @@ public class TCFReader implements CorpusReader {
 
     private int currentSentence = 0;
 
-    public TCFReader(InputStream tcfStream) throws WLFormatException {
-        EnumSet<TextCorpusLayerTag> layersToRead = EnumSet.of(TextCorpusLayerTag.SENTENCES, TextCorpusLayerTag.TOKENS,
-                TextCorpusLayerTag.POSTAGS, TextCorpusLayerTag.PARSING_DEPENDENCY, TextCorpusLayerTag.MORPHOLOGY);
+    public TCFReader(InputStream tcfStream, EnumSet<TextCorpusLayerTag> layersToRead) throws WLFormatException {
         textCorpus = new TextCorpusStreamed(tcfStream, layersToRead);
 
         sentencesLayer = textCorpus.getSentencesLayer();
@@ -94,28 +92,41 @@ public class TCFReader implements CorpusReader {
         eu.clarin.weblicht.wlfxb.tc.api.Sentence tcfSentence = sentencesLayer.getSentence(currentSentence);
         Token[] tcfTokens = sentencesLayer.getTokens(tcfSentence);
         Map<Token, Integer> tokenPositions = getTokenPositions(tcfTokens);
-        DependencyParse parse = dependencyParsingLayer.getParse(currentSentence);
-        Map<Integer, RelationGovenor> dependencies = extractDependencies(parse, tokenPositions);
+
+        Map<Integer, RelationGovenor> dependencies = null;
+        if (dependencyParsingLayer != null) {
+            DependencyParse parse = dependencyParsingLayer.getParse(currentSentence);
+            dependencies = extractDependencies(parse, tokenPositions);
+        }
 
         ImmutableList.Builder<CONLLToken> tokensBuilder = ImmutableList.builder();
         for (int i = 0; i < tcfTokens.length; i++) {
             Token tcfToken = tcfTokens[i];
-            PosTag posTag = posTagsLayer.getTag(tcfToken);
 
-            Optional<String> features = flatMorphology(tcfToken);
+            Optional<String> posTag = Optional.absent();
+            if (posTagsLayer != null)
+                posTag = Optional.of(posTagsLayer.getTag(tcfToken).getString());
 
-            RelationGovenor relationGovenor = dependencies.get(i);
+            Optional<String> features = Optional.absent();
+            if (morphologyLayer != null)
+                features = flatMorphology(tcfToken);
 
-            if (relationGovenor == null)
-                tokensBuilder.add(new CONLLToken(i + 1, tcfToken.getString(), Optional.<String>absent(),
-                        Optional.of(posTag.getString()), Optional.of(posTag.getString()), features,
-                        Optional.of(0), Optional.of("ROOT"),
-                        Optional.<Integer>absent(), Optional.<String>absent()));
-            else
-                tokensBuilder.add(new CONLLToken(i + 1, tcfToken.getString(), Optional.<String>absent(),
-                        Optional.of(posTag.getString()), Optional.of(posTag.getString()), features,
-                        Optional.of(relationGovenor.getGovernor() + 1), Optional.of(relationGovenor.getRelation()),
-                        Optional.<Integer>absent(), Optional.<String>absent()));
+            Optional<Integer> governor = Optional.absent();
+            Optional<String> relation = Optional.absent();
+            if (dependencies != null) {
+                RelationGovenor relationGovenor = dependencies.get(i);
+
+                if (relationGovenor == null) {
+                    governor = Optional.of(0);
+                    relation = Optional.of("ROOT");
+                } else {
+                    governor = Optional.of(relationGovenor.getGovernor() + 1);
+                    relation = Optional.of(relationGovenor.getRelation());
+                }
+            }
+
+            tokensBuilder.add(new CONLLToken(i + 1, tcfToken.getString(), Optional.<String>absent(),
+                    posTag, posTag, features, governor, relation, Optional.<Integer>absent(), Optional.<String>absent()));
         }
 
         ++currentSentence;
