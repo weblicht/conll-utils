@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * A {@link de.tuebingen.uni.sfs.clarind.conllutils.readers.CorpusReader} for TCF files.
+ *
  * @author Daniël de Kok <me@danieldk.eu>
  */
 public class TCFReader implements CorpusReader {
@@ -32,6 +34,14 @@ public class TCFReader implements CorpusReader {
 
     private int currentSentence = 0;
 
+    /**
+     * Construct a {@link TCFReader} from a stream of TCF, specifying the layers that should
+     * be read.
+     *
+     * @param tcfStream The TCF stream.
+     * @param layersToRead The layers that should be read.
+     * @throws WLFormatException
+     */
     public TCFReader(InputStream tcfStream, EnumSet<TextCorpusLayerTag> layersToRead) throws WLFormatException {
         textCorpus = new TextCorpusStreamed(tcfStream, layersToRead);
 
@@ -44,8 +54,8 @@ public class TCFReader implements CorpusReader {
         morphologyLayer = textCorpus.getMorphologyLayer();
     }
 
-    public Map<Integer, RelationGovenor> extractDependencies(DependencyParse parse, Map<Token, Integer> tokenPositions) {
-        ImmutableMap.Builder<Integer, RelationGovenor> depBuilder = ImmutableMap.builder();
+    private Map<Integer, RelationGovernor> extractDependencies(DependencyParse parse, Map<Token, Integer> tokenPositions) {
+        ImmutableMap.Builder<Integer, RelationGovernor> depBuilder = ImmutableMap.builder();
 
         for (Dependency dependency : parse.getDependencies()) {
             Token[] dependants = dependencyParsingLayer.getDependentTokens(dependency);
@@ -64,7 +74,7 @@ public class TCFReader implements CorpusReader {
                     if (govIdx == null)
                         throw new RuntimeException(String.format("Governor in relation is not in the corresponding sentence: %s", gov));
 
-                    depBuilder.put(depIdx, new RelationGovenor(dependency.getFunction(), govIdx));
+                    depBuilder.put(depIdx, new RelationGovernor(dependency.getFunction(), govIdx));
                 }
         }
 
@@ -93,7 +103,7 @@ public class TCFReader implements CorpusReader {
         Token[] tcfTokens = sentencesLayer.getTokens(tcfSentence);
         Map<Token, Integer> tokenPositions = getTokenPositions(tcfTokens);
 
-        Map<Integer, RelationGovenor> dependencies = null;
+        Map<Integer, RelationGovernor> dependencies = null;
         if (dependencyParsingLayer != null) {
             DependencyParse parse = dependencyParsingLayer.getParse(currentSentence);
             dependencies = extractDependencies(parse, tokenPositions);
@@ -114,14 +124,14 @@ public class TCFReader implements CorpusReader {
             Optional<Integer> governor = Optional.absent();
             Optional<String> relation = Optional.absent();
             if (dependencies != null) {
-                RelationGovenor relationGovenor = dependencies.get(i);
+                RelationGovernor relationGovernor = dependencies.get(i);
 
-                if (relationGovenor == null) {
+                if (relationGovernor == null) {
                     governor = Optional.of(0);
                     relation = Optional.of("ROOT");
                 } else {
-                    governor = Optional.of(relationGovenor.getGovernor() + 1);
-                    relation = Optional.of(relationGovenor.getRelation());
+                    governor = Optional.of(relationGovernor.getGovernor() + 1);
+                    relation = Optional.of(relationGovernor.getRelation());
                 }
             }
 
@@ -153,12 +163,12 @@ public class TCFReader implements CorpusReader {
     public void close() throws IOException {
     }
 
-    private class RelationGovenor {
+    private class RelationGovernor {
         private final String relation;
 
         private final int governor;
 
-        private RelationGovenor(String relation, int governor) {
+        private RelationGovernor(String relation, int governor) {
             this.relation = relation;
             this.governor = governor;
         }
