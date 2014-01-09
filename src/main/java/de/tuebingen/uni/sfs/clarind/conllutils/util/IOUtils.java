@@ -10,6 +10,13 @@ public class IOUtils {
         return new BufferedReader(new InputStreamReader(System.in));
     }
 
+    public static InputStream openArgOrStdinStream(String[] args, int n) throws IOException {
+        if (n < args.length)
+            return new FileInputStream(args[n]);
+
+        return System.in;
+    }
+
     public static BufferedWriter openArgOrStdout(String[] args, int n) throws IOException {
         if (n < args.length)
             return new BufferedWriter(new FileWriter(args[n]));
