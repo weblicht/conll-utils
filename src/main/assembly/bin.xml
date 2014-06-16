@@ -23,6 +23,7 @@
                 <include>conll-postag</include>
                 <include>conll-replace</include>
                 <include>conll-sample</include>
+                <include>tcf2conll</include>
             </includes>
         </fileSet>
         <fileSet>
