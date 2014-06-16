@@ -26,6 +26,8 @@ public class TCFReader implements CorpusReader {
 
     private final SentencesLayer sentencesLayer;
 
+    private final LemmasLayer lemmasLayer;
+
     private final PosTagsLayer posTagsLayer;
 
     private final DependencyParsingLayer dependencyParsingLayer;
@@ -46,6 +48,8 @@ public class TCFReader implements CorpusReader {
         textCorpus = new TextCorpusStreamed(tcfStream, layersToRead);
 
         sentencesLayer = textCorpus.getSentencesLayer();
+
+        lemmasLayer = textCorpus.getLemmasLayer();
 
         posTagsLayer = textCorpus.getPosTagsLayer();
 
@@ -113,6 +117,10 @@ public class TCFReader implements CorpusReader {
         for (int i = 0; i < tcfTokens.length; i++) {
             Token tcfToken = tcfTokens[i];
 
+            Optional<String> lemma = Optional.absent();
+            if (lemmasLayer != null)
+                lemma = Optional.of(lemmasLayer.getLemma(tcfToken).getString());
+
             Optional<String> posTag = Optional.absent();
             if (posTagsLayer != null)
                 posTag = Optional.of(posTagsLayer.getTag(tcfToken).getString());
@@ -135,8 +143,8 @@ public class TCFReader implements CorpusReader {
                 }
             }
 
-            tokensBuilder.add(new CONLLToken(i + 1, tcfToken.getString(), Optional.<String>absent(),
-                    posTag, posTag, features, governor, relation, Optional.<Integer>absent(), Optional.<String>absent()));
+            tokensBuilder.add(new CONLLToken(i + 1, tcfToken.getString(), lemma, posTag, posTag, features,
+                    governor, relation, Optional.<Integer>absent(), Optional.<String>absent()));
         }
 
         ++currentSentence;

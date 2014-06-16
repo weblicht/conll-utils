@@ -29,6 +29,8 @@ public class TCF2CONLL {
             layersToRead.add(TextCorpusLayerTag.POSTAGS);
         if (cmdLine.hasOption("morphology"))
             layersToRead.add(TextCorpusLayerTag.MORPHOLOGY);
+        if (cmdLine.hasOption("lemma"))
+            layersToRead.add(TextCorpusLayerTag.LEMMAS);
 
         try (CorpusReader tcfReader = new TCFReader(IOUtils.openArgOrStdinStream(cmdLine.getArgs(), 0), layersToRead);
              CONLLWriter conllWriter = new CONLLWriter(IOUtils.openArgOrStdout(cmdLine.getArgs(), 1))) {
@@ -53,6 +55,7 @@ public class TCF2CONLL {
         Options options = new Options();
         options.addOption("d", "dependency", false, "Read dependency layer");
         options.addOption("p", "postag", false, "Read POS tag layer");
+        options.addOption("l", "lemma", false, "Read lemma layer");
         options.addOption("m", "morphology", false, "Read morphology layer");
         return options;
     }
