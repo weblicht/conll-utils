@@ -25,6 +25,10 @@ public final class ExpandMorph {
         TENSE
     }
 
+    private static char UNDERSPECIFIED_SHORT = '*';
+
+    private static String UNDERSPECIFIED_LONG = "underspecified";
+
     private static Map<String, List<MorphAttribute>> TAG_ATTRIBUTES =
             ImmutableMap.<String, List<MorphAttribute>>builder()
                     .put("ADJA", ImmutableList.of(MorphAttribute.CASE, MorphAttribute.NUMBER, MorphAttribute.GENDER))
@@ -59,6 +63,20 @@ public final class ExpandMorph {
                     .put("VVIMP", ImmutableList.of(MorphAttribute.NUMBER))
                     .build();
 
+    private static Map<MorphAttribute, Map<Character, String>> MORPH_LONG_NAMES =
+            ImmutableMap.<MorphAttribute, Map<Character, String>>builder()
+                    .put(MorphAttribute.CASE, ImmutableMap.of('n', "nominative", 'g', "genitive", 'd', "dative",
+                            'a', "accusative", UNDERSPECIFIED_SHORT, UNDERSPECIFIED_LONG))
+                    .put(MorphAttribute.GENDER, ImmutableMap.of('m', "masculine", 'f', "feminine", 'n', "neuter",
+                            UNDERSPECIFIED_SHORT, UNDERSPECIFIED_LONG))
+                    .put(MorphAttribute.NUMBER, ImmutableMap.of('s', "singular", 'p', "plural",
+                            UNDERSPECIFIED_SHORT, UNDERSPECIFIED_LONG))
+                    .put(MorphAttribute.MOOD, ImmutableMap.of('i', "indicative", 'k', "subjunctive"))
+                    .put(MorphAttribute.PERSON, ImmutableMap.of('1', "1", '2', "2", '3', "3",
+                            UNDERSPECIFIED_SHORT, UNDERSPECIFIED_LONG))
+                    .put(MorphAttribute.TENSE, ImmutableMap.of('s', "present", 't', "past"))
+            .build();
+
 
     public static Sentence expandMorphology(Sentence sentence) {
         ImmutableList.Builder<CONLLToken> builder = ImmutableList.builder();
@@ -85,7 +103,9 @@ public final class ExpandMorph {
             List<String> avs = new ArrayList<>();
 
             for (int i = 0; i < attributes.size(); ++i) {
-                avs.add(String.format("%s=%c", attributes.get(i).toString().toLowerCase(), morph.get().charAt(i)));
+                char morphShort = morph.get().charAt(i);
+                String morphLong = MORPH_LONG_NAMES.get(attributes.get(i)).get(morphShort);
+                avs.add(String.format("%s=%s", attributes.get(i).toString().toLowerCase(), morphLong));
             }
 
             // Add feature with combined morphology.
