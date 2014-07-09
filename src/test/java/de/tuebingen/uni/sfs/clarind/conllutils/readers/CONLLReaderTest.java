@@ -23,6 +23,16 @@ public class CONLLReaderTest {
         }
     }
 
+
+    @Test
+    public void readSentenceRobustnessTest() throws Exception {
+        try (CorpusReader reader = new CONLLReader(new BufferedReader(new StringReader(Common.TEST_FRAGMENT_ROBUST)))) {
+            Assert.assertEquals(Common.TEST_SENTENCE_1, reader.readSentence());
+            Assert.assertEquals(Common.TEST_SENTENCE_2, reader.readSentence());
+            Assert.assertNull(reader.readSentence());
+        }
+    }
+
     @Test(expected = IOException.class)
     public void tooFewColumnsTest() throws Exception {
         try (CorpusReader reader = new CONLLReader(new BufferedReader(new StringReader(ERRONEOUS_FRAGMENT)))) {

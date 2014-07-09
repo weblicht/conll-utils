@@ -12,6 +12,13 @@ public class Common {
             "1\tGilles\tGilles\tN\tNE\tnsm\t0\tROOT\n" +
             "2\tDeleuze\tDeleuze\tN\tNE\tnsm\t1\tAPP";
 
+    // Has two separating lines. Not according to the CoNLL standard, but we want to be able to
+    // swallow it.
+    public static String TEST_FRAGMENT_ROBUST = "1\tDie\tdie\tART\tART\tnsf\t2\tDET\n" +
+            "2\tGroßaufnahme\tGroßaufnahme\tN\tNN\tnsf\t0\tROOT\n\n\n" +
+            "1\tGilles\tGilles\tN\tNE\tnsm\t0\tROOT\n" +
+            "2\tDeleuze\tDeleuze\tN\tNE\tnsm\t1\tAPP";
+
     public static String TEST_FRAGMENT_EMPTY_PROJ = "1\tDie\tdie\tART\tART\tnsf\t2\tDET\t_\t_\n" +
             "2\tGroßaufnahme\tGroßaufnahme\tN\tNN\tnsf\t0\tROOT\t_\t_\n\n" +
             "1\tGilles\tGilles\tN\tNE\tnsm\t0\tROOT\t_\t_\n" +
