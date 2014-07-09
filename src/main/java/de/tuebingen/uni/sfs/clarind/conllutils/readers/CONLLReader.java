@@ -69,6 +69,9 @@ public class CONLLReader implements CorpusReader {
 
             // We are done with these tokens.
             if (parts.length == 0) {
+                if (tokens.isEmpty())
+                    continue;
+
                 tokens.addAll(endMarkers);
                 return new PlainSentence(tokens);
             }
