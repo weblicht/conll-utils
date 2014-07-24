@@ -9,7 +9,7 @@ import org.apache.commons.cli.*;
 
 import java.io.IOException;
 
-public class TCF {
+public class CONLL2TCF {
     private static final String PROGRAM_NAME = "conll2tcf";
 
     public static void main(String[] args) {

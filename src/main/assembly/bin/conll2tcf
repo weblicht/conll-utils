@@ -3,4 +3,4 @@
 SCRIPT=${BASH_SOURCE[0]}
 BASEDIR=$(dirname ${SCRIPT})/..
 
-java -Xmx1024m -cp "${BASEDIR}/lib/*" de.tuebingen.uni.sfs.clarind.conllutils.cli.TCF $@
+java -Xmx1024m -cp "${BASEDIR}/lib/*" de.tuebingen.uni.sfs.clarind.conllutils.cli.CONLL2TCF $@
