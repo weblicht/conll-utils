@@ -1,24 +1,52 @@
 # CONLL utilities cookbook
 
-## Prepare data for training the OpenNLP tagger or Malt
+## OpenNLP tagger
 
 Required steps:
 
-* Replace the PROP tag by PROAV.
-* Replace the PIDAT tag by PIAT.
-* Don't use coarse-grained tags.
-* Remove the features column.
+1. Replace the PROP tag by PROAV.
+2. Replace the PIDAT tag by PIAT.
+3. Don't use coarse-grained tags.
+4. Remove the features column.
 
 Command:
 
     conll-replace PROP:PROAV,PIDAT:PIAT postag r9+lemmas-82043.conll | \
       conll-postag -f | conll-replace ".*:_" FEATURES > r9+lemmas-82043-onlp.conll
 
-Malt (also remove lemmas):
+## Malt parser
+
+Required steps:
+
+1. Replace the PROP tag by PROAV.
+2. Replace the PIDAT tag by PIAT.
+3. Don't use coarse-grained tags.
+4. Remove the features column.
+5. Remove lemma column
+
+Command:
 
     conll-replace PROP:PROAV,PIDAT:PIAT postag r9+lemmas-82043.conll | \
       conll-postag -f | conll-replace ".*:_" FEATURES | \
       conll-replace ".*:_" LEMMA > r9+nolemmas-82043-malt.conll
+
+## Malt parser (morphology)
+
+Required steps:
+
+1. Construct data for the malt parser (see previous recipe).
+2. Convert the data from CoNLL-X to TCF.
+3. Upload the TCF to WebLicht and add morphology annotations.
+4. Convert the resulting TCF back to CoNLL-X.
+
+CoNLL to TCF:
+
+    conll2tcf -g de -d tuebadz -p tuebadz r9+nolemmas-82043-malt.conll \
+      r9+nolemmas-82043-malt.tcf
+
+TCF to CoNLL:
+    tcf2conll -p -d -m r9+nolemmas-morph-82043-malt.tcf \
+      r9+nolemmas-morph-82043-malt.conll
 
 ## Prepare a sample for manual evaluation
 
