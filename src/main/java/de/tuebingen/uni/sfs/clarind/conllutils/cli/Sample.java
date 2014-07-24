@@ -1,32 +1,37 @@
 package de.tuebingen.uni.sfs.clarind.conllutils.cli;
 
-import de.tuebingen.uni.sfs.clarind.conllutils.readers.*;
+import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLReader;
+import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLToken;
+import de.tuebingen.uni.sfs.clarind.conllutils.readers.PlainSentence;
+import de.tuebingen.uni.sfs.clarind.conllutils.readers.Sentence;
 import de.tuebingen.uni.sfs.clarind.conllutils.sample.ReservoirSampler;
+import de.tuebingen.uni.sfs.clarind.conllutils.sample.Sampler;
 import de.tuebingen.uni.sfs.clarind.conllutils.util.IOUtils;
 import de.tuebingen.uni.sfs.clarind.conllutils.writers.CONLLWriter;
 import org.apache.commons.cli.*;
+import org.apache.commons.math3.random.MersenneTwister;
+import org.apache.commons.math3.random.RandomGenerator;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Random;
 
 public class Sample {
     private static final String PROGRAM_NAME = "conll-sample";
 
     public static void main(String[] args) {
-        final Options options = programOptions();
-        final CommandLine cmdLine = parseArguments(options, args);
+        Options options = programOptions();
+        CommandLine cmdLine = parseArguments(options, args);
 
-        final Random rng = cmdLine.hasOption('s') ? new Random(Long.parseLong(cmdLine.getOptionValue('s'))) : new Random();
+        RandomGenerator rng = cmdLine.hasOption('s') ?
+                new MersenneTwister(Long.parseLong(cmdLine.getOptionValue('s'))) : new MersenneTwister();
         final int sampleSize = cmdLine.hasOption('n') ? Integer.parseInt(cmdLine.getOptionValue('n')) : 100;
-        ReservoirSampler<List<CONLLToken>> sampler = new ReservoirSampler<>(rng, sampleSize);
 
+        Sampler<List<CONLLToken>> sampler = new ReservoirSampler<>(sampleSize, rng);
         readAndSample(cmdLine, sampler);
-
-        writeSample(cmdLine, sampler.getSample());
+        writeSample(cmdLine, sampler.sample());
     }
 
-    private static void readAndSample(CommandLine cmdLine, ReservoirSampler<List<CONLLToken>> sampler) {
+    private static void readAndSample(CommandLine cmdLine, Sampler<List<CONLLToken>> sampler) {
         try (CONLLReader reader = new CONLLReader(IOUtils.openArgOrStdin(cmdLine.getArgs(), 0))) {
             Sentence sentence;
             while ((sentence = reader.readSentence()) != null)
@@ -37,7 +42,7 @@ public class Sample {
         }
     }
 
-    private static void writeSample(CommandLine cmdLine, List<List<CONLLToken>> sample) {
+    private static void writeSample(CommandLine cmdLine, Iterable<List<CONLLToken>> sample) {
         try (CONLLWriter writer = new CONLLWriter(IOUtils.openArgOrStdout(cmdLine.getArgs(), 1))) {
             writeSample(writer, sample);
         } catch (IOException e) {
@@ -63,7 +68,7 @@ public class Sample {
         return options;
     }
 
-    private static void writeSample(CONLLWriter writer, List<List<CONLLToken>> sample) throws IOException {
+    private static void writeSample(CONLLWriter writer, Iterable<List<CONLLToken>> sample) throws IOException {
         for (List<CONLLToken> sentence : sample) {
             writer.write(new PlainSentence(sentence));
         }

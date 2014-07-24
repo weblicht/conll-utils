@@ -1,97 +1,67 @@
 package de.tuebingen.uni.sfs.clarind.conllutils.sample;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
+import org.apache.commons.math3.random.RandomGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
- * This class implements a reservoir sampler. A reservoir sampler samples
- * efficiently from a number of items that is large or unknown. If <i>n</i>
- * is the size of the sample and <i>m</i> the total number of items, memory
- * complexity is <i>O(n)</i> and time complexity <i>O(m)</i>.
+ * A reservoir sampler.
  *
- * @param <T>
+ * @author Daniël de Kok <me@danieldk.eu>
  */
-public class ReservoirSampler<T> {
-    // The index of the next element that is added.
-    private int idx;
+public class ReservoirSampler<T> implements Sampler<T> {
+    private final RandomGenerator random;
 
-    // The current sample.
     private final List<T> sample;
 
-    // The random number generator used for sampling.
-    private final Random rng;
-
-    // The size of the sample.
     private final int sampleSize;
 
-    /**
-     * Construct a reservoir sampler of the given sample size. Calling this
-     * constructor is equivalent to calling {@link #ReservoirSampler(java.util.Random, int)}
-     * with {@link Random#Random()} as the random number generator.
-     *
-     * @param sampleSize
-     */
-    public ReservoirSampler(int sampleSize) {
-        this(new Random(), sampleSize);
-    }
+    private int itemsSampled;
 
-    /**
-     * Construct a reservoir sampler of the given sample size. The provided
-     * random number generator will be used for sampling.
-     *
-     * @param rng
-     * @param sampleSize
-     */
-    public ReservoirSampler(Random rng, int sampleSize) {
-        idx = 0;
-        sample = new ArrayList<>(sampleSize);
-        this.rng = rng;
+    public ReservoirSampler(int sampleSize, RandomGenerator random) {
+        Preconditions.checkArgument(sampleSize > 0);
+        Preconditions.checkNotNull(random);
+
         this.sampleSize = sampleSize;
+        this.random = random;
+
+        itemsSampled = 0;
+        sample = new ArrayList<>();
     }
 
-    /**
-     * Add the provided instance to the sampler.
-     *
-     * @param instance The instance.
-     */
-    public void add(T instance) {
-        if (sample.size() < sampleSize)
-            sample.add(instance);
-        else {
-            int randomIdx = rng.nextInt(idx + 1);
+    @Override
+    public Optional<T> add(T item) {
+        Preconditions.checkNotNull(item);
 
-            if (randomIdx < sampleSize)
-                sample.set(randomIdx, instance);
+        ++itemsSampled;
+
+        // If the sample does not yet contain the maximum number of items,
+        // we can simply add the item to the sample.
+        if (itemsSampled <= sampleSize) {
+            sample.add(item);
+            return Optional.absent();
         }
 
-        ++idx;
+        int idx = random.nextInt(itemsSampled);
+        if (idx < sample.size()) {
+            T oldItem = sample.get(idx);
+            sample.set(idx, item);
+            return Optional.of(oldItem);
+        }
+
+        return Optional.of(item);
     }
 
-    /**
-     * Get the current sample.
-     *
-     * @return The sample.
-     */
-    public List<T> getSample() {
-        return ImmutableList.copyOf(sample);
-    }
-
-    /**
-     * Get the number of items seen be the sampler.
-     * @return The number of items.
-     */
-    public int getNItems() {
-        return idx;
-    }
-
-    /**
-     * Get the sample size.
-     * @return The sample size.
-     */
-    public int getSampleSize() {
+    @Override
+    public int maxSize() {
         return sampleSize;
+    }
+
+    @Override
+    public Iterable<T> sample() {
+        return sample;
     }
 }
