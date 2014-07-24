@@ -35,7 +35,7 @@ public class TCF2CONLL {
         try (CorpusReader tcfReader = new TCFReader(IOUtils.openArgOrStdinStream(cmdLine.getArgs(), 0), layersToRead);
              CONLLWriter conllWriter = new CONLLWriter(IOUtils.openArgOrStdout(cmdLine.getArgs(), 1))) {
             conllWriter.write(tcfReader);
-        } catch (IOException | WLFormatException e) {
+        } catch (IOException e) {
             System.err.println(e.getMessage());
         }
     }
