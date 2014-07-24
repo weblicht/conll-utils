@@ -8,6 +8,14 @@
     </formats>
     <fileSets>
         <fileSet>
+            <directory>${project.basedir}</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>Cookbook.md</include>
+                <include>README.md</include>
+            </includes>
+        </fileSet>
+        <fileSet>
             <directory>${project.build.directory}</directory>
             <outputDirectory>/lib</outputDirectory>
             <includes>
