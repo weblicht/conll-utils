@@ -27,3 +27,15 @@ A lot, including:
 * Partitioning is currently interleaving. Also support chunked partitioning.
 * Test with problematic inputs.
 * Merge specific columns from two CoNLL files.
+
+## License
+
+Portions of this software were originally part of Jitar, which is licensed
+under the Apache License version 2.0:
+
+https://github.com/danieldk/jitar
+
+These files are marked by a Apache License 2 header. The remainder of this
+software is under the General Public License version 3 (enclosed in
+LICENSE.gpl-3.0.txt).
+

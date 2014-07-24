@@ -2,7 +2,7 @@ package de.tuebingen.uni.sfs.clarind.conllutils.readers;
 
 // Copyright 2008, 2013 Daniel de Kok
 //
-// This class was borrowed from the Jitar tagger.
+// This class is part of the Jitar tagger.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
