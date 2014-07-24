@@ -45,6 +45,7 @@ CoNLL to TCF:
       r9+nolemmas-82043-malt.tcf
 
 TCF to CoNLL:
+
     tcf2conll -p -d -m r9+nolemmas-morph-82043-malt.tcf \
       r9+nolemmas-morph-82043-malt.conll
 
