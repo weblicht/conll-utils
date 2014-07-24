@@ -18,7 +18,7 @@ Malt (also remove lemmas):
 
     conll-replace PROP:PROAV,PIDAT:PIAT postag r9+lemmas-82043.conll | \
       conll-postag -f | conll-replace ".*:_" FEATURES | \
-      conll-replace ".*:_" LEMMA > r9+lemmas-82043-malt.conll
+      conll-replace ".*:_" LEMMA > r9+nolemmas-82043-malt.conll
 
 ## Prepare a sample for manual evaluation
 
