@@ -22,8 +22,6 @@ import java.util.Map;
  * @author Daniël de Kok <me@danieldk.eu>
  */
 public class TCFReader implements CorpusReader {
-    private final TextCorpus textCorpus;
-
     private final SentencesLayer sentencesLayer;
 
     private final LemmasLayer lemmasLayer;
@@ -45,17 +43,13 @@ public class TCFReader implements CorpusReader {
      * @throws WLFormatException
      */
     public TCFReader(InputStream tcfStream, EnumSet<TextCorpusLayerTag> layersToRead) throws WLFormatException {
-        textCorpus = new TextCorpusStreamed(tcfStream, layersToRead);
-
-        sentencesLayer = textCorpus.getSentencesLayer();
-
-        lemmasLayer = textCorpus.getLemmasLayer();
-
-        posTagsLayer = textCorpus.getPosTagsLayer();
-
-        dependencyParsingLayer = textCorpus.getDependencyParsingLayer();
-
-        morphologyLayer = textCorpus.getMorphologyLayer();
+        try (TextCorpusStreamed textCorpus = new TextCorpusStreamed(tcfStream, layersToRead)) {
+            sentencesLayer = textCorpus.getSentencesLayer();
+            lemmasLayer = textCorpus.getLemmasLayer();
+            posTagsLayer = textCorpus.getPosTagsLayer();
+            dependencyParsingLayer = textCorpus.getDependencyParsingLayer();
+            morphologyLayer = textCorpus.getMorphologyLayer();
+        }
     }
 
     private Map<Integer, RelationGovernor> extractDependencies(DependencyParse parse, Map<Token, Integer> tokenPositions) {
