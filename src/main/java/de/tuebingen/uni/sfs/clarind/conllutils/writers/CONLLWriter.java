@@ -7,6 +7,8 @@ import java.io.IOException;
 
 /**
  * Writer for CONLL dependency, lemma and part-of-speech tag corpora.
+ *
+ * @author Daniël de Kok <me@danieldk.eu>
  */
 public class CONLLWriter extends AbstractCorpusWriter {
     private final BufferedWriter writer;

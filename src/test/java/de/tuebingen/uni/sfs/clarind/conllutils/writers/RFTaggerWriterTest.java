@@ -1,14 +1,17 @@
 package de.tuebingen.uni.sfs.clarind.conllutils.writers;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 import de.tuebingen.uni.sfs.clarind.conllutils.Common;
+import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLToken;
+import de.tuebingen.uni.sfs.clarind.conllutils.readers.PlainSentence;
+import de.tuebingen.uni.sfs.clarind.conllutils.readers.Sentence;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.StringWriter;
-
-import static org.junit.Assert.*;
 
 /**
  * Unit tests for {@link de.tuebingen.uni.sfs.clarind.conllutils.writers.RFTaggerWriter}
@@ -20,17 +23,43 @@ public class RFTaggerWriterTest {
             "Gilles\tNE.n.s.m\n" +
             "Deleuze\tNE.n.s.m\n";
 
+    public static Sentence TEST_SENTENCE_1_INCORRECT_CARD = new PlainSentence(ImmutableList.of(
+            new CONLLToken(1, "Die", Optional.of("die"), Optional.of("ART"), Optional.of("ART"), Optional.of("ns"),
+                    Optional.of(2), Optional.of("DET"), Optional.<Integer>absent(), Optional.<String>absent()),
+            new CONLLToken(2, "Großaufnahme", Optional.of("Großaufnahme"), Optional.of("N"), Optional.of("NN"), Optional.of("nsf"),
+                    Optional.of(0), Optional.of("ROOT"), Optional.<Integer>absent(), Optional.<String>absent())));
+
     @Test
     public void writerTest() throws IOException {
         StringWriter stringWriter = new StringWriter();
 
-        try (RFTaggerWriter rfTaggerWriter = new RFTaggerWriter(new BufferedWriter(stringWriter), true)) {
+        try (RFTaggerWriter rfTaggerWriter = new RFTaggerWriter(new BufferedWriter(stringWriter), true, true)) {
             rfTaggerWriter.write(Common.TEST_SENTENCE_1);
             rfTaggerWriter.write(Common.TEST_SENTENCE_2);
         }
 
         Assert.assertEquals(SENTENCE_1_2_FRAGMENT, stringWriter.toString());
-
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void writerCardinalityTest() throws IOException {
+        StringWriter stringWriter = new StringWriter();
+
+        try (RFTaggerWriter rfTaggerWriter = new RFTaggerWriter(new BufferedWriter(stringWriter), true, true)) {
+            rfTaggerWriter.write(Common.TEST_SENTENCE_1);
+            rfTaggerWriter.write(Common.TEST_SENTENCE_2);
+            rfTaggerWriter.write(TEST_SENTENCE_1_INCORRECT_CARD);
+        }
+    }
+
+    @Test
+    public void noWriterCardinalityTest() throws IOException {
+        StringWriter stringWriter = new StringWriter();
+
+        try (RFTaggerWriter rfTaggerWriter = new RFTaggerWriter(new BufferedWriter(stringWriter), true, false)) {
+            rfTaggerWriter.write(Common.TEST_SENTENCE_1);
+            rfTaggerWriter.write(Common.TEST_SENTENCE_2);
+            rfTaggerWriter.write(TEST_SENTENCE_1_INCORRECT_CARD);
+        }
+    }
 }

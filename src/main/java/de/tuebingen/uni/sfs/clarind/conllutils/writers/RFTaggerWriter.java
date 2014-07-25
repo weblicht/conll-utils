@@ -7,9 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * A writer for RFTagger training files.
@@ -17,17 +15,25 @@ import java.util.List;
  * @author Daniël de Kok <me@danieldk.eu>
  */
 public class RFTaggerWriter extends AbstractCorpusWriter {
-    private final BufferedWriter writer;
+    private final boolean cardinalityCheck;
+
+    // Number of morphological features per tag.
+    private final Map<String, Integer> featureCardinality;
 
     private boolean firstSentence;
 
     private final boolean tuebaFormat;
 
-    public RFTaggerWriter(BufferedWriter writer, boolean tuebaFormat) {
+    private final BufferedWriter writer;
+
+    public RFTaggerWriter(BufferedWriter writer, boolean tuebaFormat, boolean cardinalityCheck) {
         Preconditions.checkNotNull(writer);
 
-        this.writer = writer;
+        this.cardinalityCheck = cardinalityCheck;
         this.tuebaFormat = tuebaFormat;
+        this.writer = writer;
+
+        featureCardinality = new HashMap<>();
         firstSentence = true;
     }
 
@@ -69,9 +75,27 @@ public class RFTaggerWriter extends AbstractCorpusWriter {
                 Collections.addAll(morph, StringUtils.split(morphFeatures, '|'));
             }
 
+            if (cardinalityCheck) {
+                checkCardinality(morph);
+            }
+
             String rfMorph = StringUtils.join(morph, '.');
 
             writer.write(String.format("%s\t%s\n", conllToken.getForm(), rfMorph));
+        }
+    }
+
+    private void checkCardinality(List<String> morph) {
+        String tag = morph.get(0);
+        int thisCard = morph.size() - 1;
+        Integer card = featureCardinality.get(tag);
+        if (card == null) {
+            featureCardinality.put(tag, thisCard);
+        } else {
+            if (!card.equals(thisCard)) {
+                throw new IllegalArgumentException(
+                        String.format("Cardinality of '%s' is %d, was %d before", tag, thisCard, card));
+            }
         }
     }
 

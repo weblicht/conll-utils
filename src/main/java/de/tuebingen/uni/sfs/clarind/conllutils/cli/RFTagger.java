@@ -22,7 +22,8 @@ public class RFTagger {
         CommandLine cmdLine = processArgs(options, args);
 
         try (CorpusReader conllReader = new CONLLReader(IOUtils.openArgOrStdin(cmdLine.getArgs(), 0));
-             CorpusWriter rfWriter = new RFTaggerWriter(IOUtils.openArgOrStdout(cmdLine.getArgs(), 1), cmdLine.hasOption('t'))) {
+             CorpusWriter rfWriter = new RFTaggerWriter(IOUtils.openArgOrStdout(cmdLine.getArgs(), 1),
+                     cmdLine.hasOption('t'), !cmdLine.hasOption('n'))) {
             rfWriter.write(conllReader);
         } catch (IOException e) {
             System.err.println(e.getMessage());
@@ -42,6 +43,7 @@ public class RFTagger {
 
     private static Options programOptions() {
         Options options = new Options();
+        options.addOption("n", "non-strict", false, "Do not check cardinalities");
         options.addOption("t", "tuebadz", false, "TüBA-D/Z-style morphology");
         return options;
     }
