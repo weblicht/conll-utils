@@ -1,5 +1,6 @@
 package de.tuebingen.uni.sfs.clarind.conllutils.writers;
 
+import com.google.common.base.Preconditions;
 import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLToken;
 import de.tuebingen.uni.sfs.clarind.conllutils.readers.Sentence;
 import org.apache.commons.lang3.StringUtils;
@@ -23,6 +24,8 @@ public class RFTaggerWriter extends AbstractCorpusWriter {
     private final boolean tuebaFormat;
 
     public RFTaggerWriter(BufferedWriter writer, boolean tuebaFormat) {
+        Preconditions.checkNotNull(writer);
+
         this.writer = writer;
         this.tuebaFormat = tuebaFormat;
         firstSentence = true;
@@ -30,6 +33,8 @@ public class RFTaggerWriter extends AbstractCorpusWriter {
 
     @Override
     public void write(Sentence sentence) throws IOException {
+        Preconditions.checkNotNull(sentence);
+
         if (firstSentence) {
             firstSentence = false;
         } else {
