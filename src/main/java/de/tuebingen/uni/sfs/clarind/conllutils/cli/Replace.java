@@ -3,12 +3,13 @@ package de.tuebingen.uni.sfs.clarind.conllutils.cli;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLReader;
-import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLToken;
-import de.tuebingen.uni.sfs.clarind.conllutils.readers.PlainSentence;
-import de.tuebingen.uni.sfs.clarind.conllutils.readers.Sentence;
 import de.tuebingen.uni.sfs.clarind.conllutils.util.IOUtils;
-import de.tuebingen.uni.sfs.clarind.conllutils.writers.CONLLWriter;
+import eu.danieldk.nlp.conllx.CONLLToken;
+import eu.danieldk.nlp.conllx.Sentence;
+import eu.danieldk.nlp.conllx.SimpleSentence;
+import eu.danieldk.nlp.conllx.Token;
+import eu.danieldk.nlp.conllx.reader.*;
+import eu.danieldk.nlp.conllx.writer.CONLLWriter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.FileNotFoundException;
@@ -34,10 +35,10 @@ public class Replace {
              CONLLWriter writer = new CONLLWriter(IOUtils.openArgOrStdout(args, 3))) {
             Sentence sentence;
             while ((sentence = reader.readSentence()) != null) {
-                ImmutableList.Builder<CONLLToken> sentenceBuilder = ImmutableList.builder();
+                ImmutableList.Builder<Token> sentenceBuilder = ImmutableList.builder();
 
-                for (CONLLToken token : sentence.getTokens()) {
-                    CONLLToken newToken;
+                for (Token token : sentence.getTokens()) {
+                    Token newToken;
                     switch (layer) {
                         case TOKEN:
                             newToken = replaceToken(token, replacements);
@@ -61,7 +62,7 @@ public class Replace {
                     sentenceBuilder.add(newToken);
                 }
 
-                writer.write(new PlainSentence(sentenceBuilder.build()));
+                writer.write(new SimpleSentence(sentenceBuilder.build()));
             }
         } catch (FileNotFoundException e) {
             System.err.println(String.format("Could not open for reading: %s", args[0]));
@@ -84,7 +85,7 @@ public class Replace {
         return builder.build();
     }
 
-    private static CONLLToken replaceDepRel(CONLLToken token, Map<Pattern, String> replacements) {
+    private static Token replaceDepRel(Token token, Map<Pattern, String> replacements) {
         if (!token.getDepRel().isPresent())
             return token;
 
@@ -92,12 +93,12 @@ public class Replace {
         if (replacement == null)
             return token;
         else
-            return new CONLLToken(token.getPosition(), token.getForm(), token.getLemma(),
-                    token.getCoursePOSTag(), token.getPosTag(), token.getFeatures(), token.getHead(),
+            return new CONLLToken(token.getID(), token.getForm(), token.getLemma(),
+                    token.getCoarsePOSTag(), token.getPosTag(), token.getFeatures(), token.getHead(),
                     Optional.of(replacement), token.getPHead(), token.getPDepRel());
     }
 
-    private static CONLLToken replacePOSTag(CONLLToken token, Map<Pattern, String> replacements) {
+    private static Token replacePOSTag(Token token, Map<Pattern, String> replacements) {
         if (!token.getPosTag().isPresent())
             return token;
 
@@ -105,12 +106,12 @@ public class Replace {
         if (replacement == null)
             return token;
         else
-            return new CONLLToken(token.getPosition(), token.getForm(), token.getLemma(),
-                    token.getCoursePOSTag(), Optional.of(replacement), token.getFeatures(), token.getHead(),
+            return new CONLLToken(token.getID(), token.getForm(), token.getLemma(),
+                    token.getCoarsePOSTag(), Optional.of(replacement), token.getFeatures(), token.getHead(),
                     token.getDepRel(), token.getPHead(), token.getPDepRel());
     }
 
-    private static CONLLToken replaceLemma(CONLLToken token, Map<Pattern, String> replacements) {
+    private static Token replaceLemma(Token token, Map<Pattern, String> replacements) {
         if (!token.getLemma().isPresent())
             return token;
 
@@ -118,22 +119,25 @@ public class Replace {
         if (replacement == null)
             return token;
         else
-            return new CONLLToken(token.getPosition(), token.getForm(), Optional.of(replacement),
-                    token.getCoursePOSTag(), token.getPosTag(), token.getFeatures(), token.getHead(),
+            return new CONLLToken(token.getID(), token.getForm(), Optional.of(replacement),
+                    token.getCoarsePOSTag(), token.getPosTag(), token.getFeatures(), token.getHead(),
                     token.getDepRel(), token.getPHead(), token.getPDepRel());
     }
 
-    private static CONLLToken replaceToken(CONLLToken token, Map<Pattern, String> replacements) {
-        String replacement = findReplacement(replacements, token.getForm());
+    private static Token replaceToken(Token token, Map<Pattern, String> replacements) {
+        if (!token.getForm().isPresent())
+            return token;
+
+        String replacement = findReplacement(replacements, token.getForm().get());
         if (replacement == null)
             return token;
         else
-            return new CONLLToken(token.getPosition(), replacement, token.getLemma(), token.getCoursePOSTag(),
-                    token.getPosTag(), token.getFeatures(), token.getHead(), token.getDepRel(),
+            return new CONLLToken(token.getID(), Optional.of(replacement), token.getLemma(),
+                    token.getCoarsePOSTag(), token.getPosTag(), token.getFeatures(), token.getHead(), token.getDepRel(),
                     token.getPHead(), token.getPDepRel());
     }
 
-    private static CONLLToken replaceFeatures(CONLLToken token, Map<Pattern, String> replacements) {
+    private static Token replaceFeatures(Token token, Map<Pattern, String> replacements) {
         if (!token.getFeatures().isPresent())
             return token;
 
@@ -142,7 +146,7 @@ public class Replace {
         if (replacement == null)
             return token;
         else
-            return new CONLLToken(token.getPosition(), token.getForm(), token.getLemma(), token.getCoursePOSTag(),
+            return new CONLLToken(token.getID(), token.getForm(), token.getLemma(), token.getCoarsePOSTag(),
                     token.getPosTag(), Optional.of(replacement), token.getHead(), token.getDepRel(),
                     token.getPHead(), token.getPDepRel());
     }

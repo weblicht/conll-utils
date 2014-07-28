@@ -1,12 +1,13 @@
 package de.tuebingen.uni.sfs.clarind.conllutils.cli;
 
 import com.google.common.collect.ImmutableList;
-import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLReader;
-import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLToken;
-import de.tuebingen.uni.sfs.clarind.conllutils.readers.PlainSentence;
-import de.tuebingen.uni.sfs.clarind.conllutils.readers.Sentence;
 import de.tuebingen.uni.sfs.clarind.conllutils.util.IOUtils;
-import de.tuebingen.uni.sfs.clarind.conllutils.writers.CONLLWriter;
+import eu.danieldk.nlp.conllx.CONLLToken;
+import eu.danieldk.nlp.conllx.Sentence;
+import eu.danieldk.nlp.conllx.SimpleSentence;
+import eu.danieldk.nlp.conllx.Token;
+import eu.danieldk.nlp.conllx.reader.*;
+import eu.danieldk.nlp.conllx.writer.CONLLWriter;
 import org.apache.commons.cli.*;
 
 import java.io.*;
@@ -24,20 +25,20 @@ public class POSTag {
              CONLLWriter writer = new CONLLWriter(IOUtils.openArgOrStdout(cmdLine.getArgs(), 1))) {
             Sentence sentence;
             while ((sentence = reader.readSentence()) != null) {
-                ImmutableList.Builder<CONLLToken> builder = ImmutableList.builder();
+                ImmutableList.Builder<Token> builder = ImmutableList.builder();
 
-                for (CONLLToken token : sentence.getTokens()) {
+                for (Token token : sentence.getTokens()) {
                     if (cmdLine.hasOption('c'))
-                        builder.add(new CONLLToken(token.getPosition(), token.getForm(), token.getLemma(),
-                                token.getCoursePOSTag(), token.getCoursePOSTag(), token.getFeatures(), token.getHead(),
+                        builder.add(new CONLLToken(token.getID(), token.getForm(), token.getLemma(),
+                                token.getCoarsePOSTag(), token.getCoarsePOSTag(), token.getFeatures(), token.getHead(),
                                 token.getDepRel(), token.getPHead(), token.getPDepRel()));
                     else
-                        builder.add(new CONLLToken(token.getPosition(), token.getForm(), token.getLemma(),
+                        builder.add(new CONLLToken(token.getID(), token.getForm(), token.getLemma(),
                                 token.getPosTag(), token.getPosTag(), token.getFeatures(), token.getHead(),
                                 token.getDepRel(), token.getPHead(), token.getPDepRel()));
                 }
 
-                writer.write(new PlainSentence(builder.build()));
+                writer.write(new SimpleSentence(builder.build()));
             }
         } catch (IOException e) {
             System.err.println(e.getMessage());

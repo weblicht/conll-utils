@@ -1,7 +1,9 @@
 package de.tuebingen.uni.sfs.clarind.conllutils.writers;
 
 import com.google.common.collect.ImmutableList;
-import de.tuebingen.uni.sfs.clarind.conllutils.readers.Sentence;
+import eu.danieldk.nlp.conllx.Sentence;
+import eu.danieldk.nlp.conllx.writer.AbstractCorpusWriter;
+import eu.danieldk.nlp.conllx.writer.CorpusWriter;
 
 import java.io.IOException;
 import java.util.List;

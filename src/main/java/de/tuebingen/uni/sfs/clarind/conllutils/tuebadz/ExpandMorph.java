@@ -3,9 +3,10 @@ package de.tuebingen.uni.sfs.clarind.conllutils.tuebadz;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLToken;
-import de.tuebingen.uni.sfs.clarind.conllutils.readers.PlainSentence;
-import de.tuebingen.uni.sfs.clarind.conllutils.readers.Sentence;
+import eu.danieldk.nlp.conllx.CONLLToken;
+import eu.danieldk.nlp.conllx.SimpleSentence;
+import eu.danieldk.nlp.conllx.Sentence;
+import eu.danieldk.nlp.conllx.Token;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -79,9 +80,9 @@ public final class ExpandMorph {
 
 
     public static Sentence expandMorphology(Sentence sentence) {
-        ImmutableList.Builder<CONLLToken> builder = ImmutableList.builder();
+        ImmutableList.Builder<Token> builder = ImmutableList.builder();
 
-        for (CONLLToken token : sentence.getTokens()) {
+        for (Token token : sentence.getTokens()) {
             Optional<String> tag = token.getPosTag();
             Optional<String> morph = token.getFeatures();
             if (!tag.isPresent() || !morph.isPresent() || morph.get().equals("--")) {
@@ -113,12 +114,12 @@ public final class ExpandMorph {
 
             String newFeatures = StringUtils.join(avs, '|');
 
-            builder.add(new CONLLToken(token.getPosition(), token.getForm(), token.getLemma(), token.getCoursePOSTag(),
+            builder.add(new CONLLToken(token.getID(), token.getForm(), token.getLemma(), token.getCoarsePOSTag(),
                     token.getPosTag(), Optional.of(newFeatures), token.getHead(), token.getDepRel(), token.getPHead(),
                     token.getPDepRel()));
         }
 
-        return new PlainSentence(builder.build());
+        return new SimpleSentence(builder.build());
     }
 
     private ExpandMorph() {}

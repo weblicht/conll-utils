@@ -1,13 +1,13 @@
 package de.tuebingen.uni.sfs.clarind.conllutils.cli;
 
-import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLReader;
-import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLToken;
-import de.tuebingen.uni.sfs.clarind.conllutils.readers.PlainSentence;
-import de.tuebingen.uni.sfs.clarind.conllutils.readers.Sentence;
 import de.tuebingen.uni.sfs.clarind.conllutils.sample.ReservoirSampler;
 import de.tuebingen.uni.sfs.clarind.conllutils.sample.Sampler;
 import de.tuebingen.uni.sfs.clarind.conllutils.util.IOUtils;
-import de.tuebingen.uni.sfs.clarind.conllutils.writers.CONLLWriter;
+import eu.danieldk.nlp.conllx.Sentence;
+import eu.danieldk.nlp.conllx.SimpleSentence;
+import eu.danieldk.nlp.conllx.Token;
+import eu.danieldk.nlp.conllx.reader.*;
+import eu.danieldk.nlp.conllx.writer.CONLLWriter;
 import org.apache.commons.cli.*;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomGenerator;
@@ -26,12 +26,12 @@ public class Sample {
                 new MersenneTwister(Long.parseLong(cmdLine.getOptionValue('s'))) : new MersenneTwister();
         final int sampleSize = cmdLine.hasOption('n') ? Integer.parseInt(cmdLine.getOptionValue('n')) : 100;
 
-        Sampler<List<CONLLToken>> sampler = new ReservoirSampler<>(sampleSize, rng);
+        Sampler<List<Token>> sampler = new ReservoirSampler<>(sampleSize, rng);
         readAndSample(cmdLine, sampler);
         writeSample(cmdLine, sampler.sample());
     }
 
-    private static void readAndSample(CommandLine cmdLine, Sampler<List<CONLLToken>> sampler) {
+    private static void readAndSample(CommandLine cmdLine, Sampler<List<Token>> sampler) {
         try (CONLLReader reader = new CONLLReader(IOUtils.openArgOrStdin(cmdLine.getArgs(), 0))) {
             Sentence sentence;
             while ((sentence = reader.readSentence()) != null)
@@ -42,7 +42,7 @@ public class Sample {
         }
     }
 
-    private static void writeSample(CommandLine cmdLine, Iterable<List<CONLLToken>> sample) {
+    private static void writeSample(CommandLine cmdLine, Iterable<List<Token>> sample) {
         try (CONLLWriter writer = new CONLLWriter(IOUtils.openArgOrStdout(cmdLine.getArgs(), 1))) {
             writeSample(writer, sample);
         } catch (IOException e) {
@@ -68,9 +68,9 @@ public class Sample {
         return options;
     }
 
-    private static void writeSample(CONLLWriter writer, Iterable<List<CONLLToken>> sample) throws IOException {
-        for (List<CONLLToken> sentence : sample) {
-            writer.write(new PlainSentence(sentence));
+    private static void writeSample(CONLLWriter writer, Iterable<List<Token>> sample) throws IOException {
+        for (List<Token> sentence : sample) {
+            writer.write(new SimpleSentence(sentence));
         }
     }
 

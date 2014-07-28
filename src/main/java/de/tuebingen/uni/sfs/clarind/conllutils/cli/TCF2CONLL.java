@@ -1,11 +1,10 @@
 package de.tuebingen.uni.sfs.clarind.conllutils.cli;
 
-import de.tuebingen.uni.sfs.clarind.conllutils.readers.CorpusReader;
 import de.tuebingen.uni.sfs.clarind.conllutils.readers.TCFReader;
 import de.tuebingen.uni.sfs.clarind.conllutils.util.IOUtils;
-import de.tuebingen.uni.sfs.clarind.conllutils.writers.CONLLWriter;
-import eu.clarin.weblicht.wlfxb.io.WLFormatException;
 import eu.clarin.weblicht.wlfxb.tc.xb.TextCorpusLayerTag;
+import eu.danieldk.nlp.conllx.reader.CorpusReader;
+import eu.danieldk.nlp.conllx.writer.CONLLWriter;
 import org.apache.commons.cli.*;
 
 import java.io.IOException;

@@ -1,9 +1,9 @@
 package de.tuebingen.uni.sfs.clarind.conllutils.cli;
 
 import de.tuebingen.uni.sfs.clarind.conllutils.readers.BrownCorpusReader;
-import de.tuebingen.uni.sfs.clarind.conllutils.readers.CorpusReader;
-import de.tuebingen.uni.sfs.clarind.conllutils.writers.CONLLWriter;
-import de.tuebingen.uni.sfs.clarind.conllutils.writers.CorpusWriter;
+import eu.danieldk.nlp.conllx.reader.CorpusReader;
+import eu.danieldk.nlp.conllx.writer.CONLLWriter;
+import eu.danieldk.nlp.conllx.writer.CorpusWriter;
 
 import java.io.*;
 

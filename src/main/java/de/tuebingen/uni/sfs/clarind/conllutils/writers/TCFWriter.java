@@ -1,10 +1,12 @@
 package de.tuebingen.uni.sfs.clarind.conllutils.writers;
 
 import com.google.common.base.Optional;
-import de.tuebingen.uni.sfs.clarind.conllutils.readers.*;
 import eu.clarin.weblicht.wlfxb.tc.api.*;
+import eu.clarin.weblicht.wlfxb.tc.api.Token;
 import eu.clarin.weblicht.wlfxb.tc.xb.TextCorpusStored;
 import eu.clarin.weblicht.wlfxb.xb.WLData;
+import eu.danieldk.nlp.conllx.Sentence;
+import eu.danieldk.nlp.conllx.writer.AbstractCorpusWriter;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -42,13 +44,17 @@ public class TCFWriter extends AbstractCorpusWriter {
     }
 
     @Override
-    public void write(de.tuebingen.uni.sfs.clarind.conllutils.readers.Sentence sentence) throws IOException {
+    public void write(Sentence sentence) throws IOException {
         List<PositionDependency> positionDependencies = new LinkedList<>();
 
         List<Token> tokens = new ArrayList<>();
 
-        for (CONLLToken taggedToken : sentence.getTokens()) {
-            Token token = tokensLayer.addToken(taggedToken.getForm());
+        for (eu.danieldk.nlp.conllx.Token taggedToken : sentence.getTokens()) {
+            if (!taggedToken.getForm().isPresent()) {
+                throw new IOException("Writing TCF requires that the input has tokens.");
+            }
+
+            Token token = tokensLayer.addToken(taggedToken.getForm().get());
             tokens.add(token);
 
             if (posTagsLayer != null)
@@ -59,7 +65,7 @@ public class TCFWriter extends AbstractCorpusWriter {
 
             if (dependencyLayer != null && taggedToken.getHead().isPresent() && taggedToken.getDepRel().isPresent())
                 positionDependencies.add(new PositionDependency(taggedToken.getDepRel().get(), taggedToken.getHead().get() - 1,
-                        taggedToken.getPosition() - 1));
+                        taggedToken.getID() - 1));
         }
 
         sentencesLayer.addSentence(tokens);

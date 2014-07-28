@@ -17,6 +17,11 @@
 package de.tuebingen.uni.sfs.clarind.conllutils.readers;
 
 import com.google.common.base.Optional;
+import eu.danieldk.nlp.conllx.CONLLToken;
+import eu.danieldk.nlp.conllx.Sentence;
+import eu.danieldk.nlp.conllx.SimpleSentence;
+import eu.danieldk.nlp.conllx.Token;
+import eu.danieldk.nlp.conllx.reader.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -50,7 +55,7 @@ public class BrownCorpusReader implements CorpusReader {
             if (line.isEmpty())
                 continue;
 
-            List<CONLLToken> tokens = new ArrayList<>();
+            List<Token> tokens = new ArrayList<>();
 
             String[] lineParts = line.split("\\s+");
             for (int i = 0; i < lineParts.length; ++i) {
@@ -71,12 +76,12 @@ public class BrownCorpusReader implements CorpusReader {
                 if (tag.isEmpty())
                     throw new IOException(String.format("Zero-length tag in '%s'", wordTag));
 
-                tokens.add(new CONLLToken(i + 1, word, Optional.<String>absent(), Optional.of(tag), Optional.of(tag),
-                        Optional.<String>absent(), Optional.<Integer>absent(), Optional.<String>absent(),
-                        Optional.<Integer>absent(), Optional.<String>absent()));
+                tokens.add(new CONLLToken(i + 1, Optional.of(word), Optional.<String>absent(), Optional.of(tag),
+                        Optional.of(tag), Optional.<String>absent(), Optional.<Integer>absent(),
+                        Optional.<String>absent(), Optional.<Integer>absent(), Optional.<String>absent()));
             }
 
-            return new PlainSentence(tokens);
+            return new SimpleSentence(tokens);
         }
 
         return null;

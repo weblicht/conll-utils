@@ -1,7 +1,7 @@
 package de.tuebingen.uni.sfs.clarind.conllutils.cli;
 
-import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLReader;
-import de.tuebingen.uni.sfs.clarind.conllutils.writers.CONLLWriter;
+import eu.danieldk.nlp.conllx.reader.CONLLReader;
+import eu.danieldk.nlp.conllx.writer.CONLLWriter;
 
 import java.io.*;
 import java.util.Arrays;

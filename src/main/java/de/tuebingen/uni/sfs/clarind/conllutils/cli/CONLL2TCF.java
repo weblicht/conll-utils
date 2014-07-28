@@ -1,10 +1,10 @@
 package de.tuebingen.uni.sfs.clarind.conllutils.cli;
 
 import com.google.common.base.Optional;
-import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLReader;
-import de.tuebingen.uni.sfs.clarind.conllutils.readers.CorpusReader;
 import de.tuebingen.uni.sfs.clarind.conllutils.util.IOUtils;
 import de.tuebingen.uni.sfs.clarind.conllutils.writers.TCFWriter;
+import eu.danieldk.nlp.conllx.reader.CONLLReader;
+import eu.danieldk.nlp.conllx.reader.CorpusReader;
 import org.apache.commons.cli.*;
 
 import java.io.IOException;

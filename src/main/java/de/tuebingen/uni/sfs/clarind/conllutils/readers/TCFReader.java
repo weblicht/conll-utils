@@ -7,6 +7,10 @@ import eu.clarin.weblicht.wlfxb.io.TextCorpusStreamed;
 import eu.clarin.weblicht.wlfxb.io.WLFormatException;
 import eu.clarin.weblicht.wlfxb.tc.api.*;
 import eu.clarin.weblicht.wlfxb.tc.xb.TextCorpusLayerTag;
+import eu.danieldk.nlp.conllx.CONLLToken;
+import eu.danieldk.nlp.conllx.Sentence;
+import eu.danieldk.nlp.conllx.SimpleSentence;
+import eu.danieldk.nlp.conllx.reader.*;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -17,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A {@link de.tuebingen.uni.sfs.clarind.conllutils.readers.CorpusReader} for TCF files.
+ * A {@link CorpusReader} for TCF files.
  *
  * @author Daniël de Kok <me@danieldk.eu>
  */
@@ -107,7 +111,7 @@ public class TCFReader implements CorpusReader {
             dependencies = extractDependencies(parse, tokenPositions);
         }
 
-        ImmutableList.Builder<CONLLToken> tokensBuilder = ImmutableList.builder();
+        ImmutableList.Builder<eu.danieldk.nlp.conllx.Token> tokensBuilder = ImmutableList.builder();
         for (int i = 0; i < tcfTokens.length; i++) {
             Token tcfToken = tcfTokens[i];
 
@@ -137,13 +141,13 @@ public class TCFReader implements CorpusReader {
                 }
             }
 
-            tokensBuilder.add(new CONLLToken(i + 1, tcfToken.getString(), lemma, posTag, posTag, features,
+            tokensBuilder.add(new CONLLToken(i + 1, Optional.of(tcfToken.getString()), lemma, posTag, posTag, features,
                     governor, relation, Optional.<Integer>absent(), Optional.<String>absent()));
         }
 
         ++currentSentence;
 
-        return new PlainSentence(tokensBuilder.build());
+        return new SimpleSentence(tokensBuilder.build());
     }
 
     // Todo: subfeatures?

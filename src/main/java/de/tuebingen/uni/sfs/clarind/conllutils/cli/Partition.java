@@ -1,10 +1,10 @@
 package de.tuebingen.uni.sfs.clarind.conllutils.cli;
 
-import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLReader;
 import de.tuebingen.uni.sfs.clarind.conllutils.util.IOUtils;
-import de.tuebingen.uni.sfs.clarind.conllutils.writers.CONLLWriter;
-import de.tuebingen.uni.sfs.clarind.conllutils.writers.CorpusWriter;
 import de.tuebingen.uni.sfs.clarind.conllutils.writers.PartitioningWriter;
+import eu.danieldk.nlp.conllx.reader.CONLLReader;
+import eu.danieldk.nlp.conllx.writer.CONLLWriter;
+import eu.danieldk.nlp.conllx.writer.CorpusWriter;
 
 import java.io.*;
 import java.util.ArrayList;

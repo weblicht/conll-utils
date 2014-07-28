@@ -1,8 +1,9 @@
 package de.tuebingen.uni.sfs.clarind.conllutils.writers;
 
 import com.google.common.base.Preconditions;
-import de.tuebingen.uni.sfs.clarind.conllutils.readers.CONLLToken;
-import de.tuebingen.uni.sfs.clarind.conllutils.readers.Sentence;
+import eu.danieldk.nlp.conllx.Sentence;
+import eu.danieldk.nlp.conllx.Token;
+import eu.danieldk.nlp.conllx.writer.AbstractCorpusWriter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedWriter;
@@ -47,23 +48,27 @@ public class RFTaggerWriter extends AbstractCorpusWriter {
             writer.write("\n");
         }
 
-        for (CONLLToken conllToken : sentence.getTokens()) {
-            if (!conllToken.getPosTag().isPresent()) {
+        for (Token token : sentence.getTokens()) {
+            if (!token.getForm().isPresent()) {
+                throw new IllegalArgumentException("Input should contain word form");
+            }
+
+            if (!token.getPosTag().isPresent()) {
                 throw new IllegalArgumentException("Input should contain fine-grained part-of-speech tags");
             }
 
-            if (!conllToken.getFeatures().isPresent()) {
+            if (!token.getFeatures().isPresent()) {
                 throw new IllegalArgumentException("Input should contain (morphology) features");
             }
 
             List<String> morph = new ArrayList<>();
-            morph.add(conllToken.getPosTag().get());
+            morph.add(token.getPosTag().get());
 
-            String morphFeatures = conllToken.getFeatures().get();
+            String morphFeatures = token.getFeatures().get();
             if (tuebaFormat) {
                 // TüBA format: one character per morphological feature.
 
-                if (conllToken.getPosTag().get().equals("APPR") && morphFeatures.equals("--")) {
+                if (token.getPosTag().get().equals("APPR") && morphFeatures.equals("--")) {
                     morph.add("*");
                 }
                 else if (!morphFeatures.equals("--")) {
@@ -81,7 +86,7 @@ public class RFTaggerWriter extends AbstractCorpusWriter {
 
             String rfMorph = StringUtils.join(morph, '.');
 
-            writer.write(String.format("%s\t%s\n", conllToken.getForm(), rfMorph));
+            writer.write(String.format("%s\t%s\n", token.getForm().get(), rfMorph));
         }
     }
 
