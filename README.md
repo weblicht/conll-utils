@@ -15,6 +15,11 @@ package contains the following programs:
 * conll-replace: replace certain values in annotation layers.
 * conll-sample: take a random sample from a CoNLL file.
 
+## Download
+
+Downloads are available on the [release page](https://github.com/weblicht/conll-utils/releases)
+and require Java 7.
+
 ## Usage
 
 Executing one the commands gives usage information. For some examples see
