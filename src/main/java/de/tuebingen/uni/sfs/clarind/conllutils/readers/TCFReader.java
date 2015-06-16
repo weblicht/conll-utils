@@ -1,8 +1,10 @@
 package de.tuebingen.uni.sfs.clarind.conllutils.readers;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Multimap;
 import eu.clarin.weblicht.wlfxb.io.TextCorpusStreamed;
 import eu.clarin.weblicht.wlfxb.io.WLFormatException;
 import eu.clarin.weblicht.wlfxb.tc.api.*;
@@ -10,15 +12,12 @@ import eu.clarin.weblicht.wlfxb.tc.xb.TextCorpusLayerTag;
 import eu.danieldk.nlp.conllx.CONLLToken;
 import eu.danieldk.nlp.conllx.Sentence;
 import eu.danieldk.nlp.conllx.SimpleSentence;
-import eu.danieldk.nlp.conllx.reader.*;
+import eu.danieldk.nlp.conllx.reader.CorpusReader;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A {@link CorpusReader} for TCF files.
@@ -36,13 +35,15 @@ public class TCFReader implements CorpusReader {
 
     private final MorphologyLayer morphologyLayer;
 
+    private final Multimap<Token, Dependency> indexedDependencies;
+
     private int currentSentence = 0;
 
     /**
      * Construct a {@link TCFReader} from a stream of TCF, specifying the layers that should
      * be read.
      *
-     * @param tcfStream The TCF stream.
+     * @param tcfStream    The TCF stream.
      * @param layersToRead The layers that should be read.
      * @throws WLFormatException
      */
@@ -54,30 +55,55 @@ public class TCFReader implements CorpusReader {
             dependencyParsingLayer = textCorpus.getDependencyParsingLayer();
             morphologyLayer = textCorpus.getMorphologyLayer();
         }
+
+        indexedDependencies = indexDependencies(dependencyParsingLayer);
     }
 
-    private Map<Integer, RelationGovernor> extractDependencies(DependencyParse parse, Map<Token, Integer> tokenPositions) {
+    private Multimap<Token, Dependency> indexDependencies(DependencyParsingLayer dependencyParsingLayer) {
+        Multimap<Token, Dependency> indexedDependencies = ArrayListMultimap.create();
+
+        if (dependencyParsingLayer == null) {
+            return indexedDependencies;
+        }
+
+        for (int i = 0; i < dependencyParsingLayer.size(); i++) {
+            Dependency[] dependencies = dependencyParsingLayer.getParse(i).getDependencies();
+            for (Dependency dependency : dependencies) {
+                for (Token dependentToken : dependencyParsingLayer.getDependentTokens(dependency)) {
+                    indexedDependencies.put(dependentToken, dependency);
+                }
+            }
+        }
+
+        return indexedDependencies;
+    }
+
+    private Map<Integer, RelationGovernor> extractDependencies(Token[] tokens, Map<Token, Integer> tokenPositions) {
         ImmutableMap.Builder<Integer, RelationGovernor> depBuilder = ImmutableMap.builder();
 
-        for (Dependency dependency : parse.getDependencies()) {
-            Token[] dependants = dependencyParsingLayer.getDependentTokens(dependency);
-            Token[] governors = dependencyParsingLayer.getGovernorTokens(dependency);
+        for (Token dep : tokens) {
+            Integer depIdx = tokenPositions.get(dep);
 
-            if (dependants == null || governors == null)
+            Collection<Dependency> dependencies = indexedDependencies.get(dep);
+            if (dependencies == null)
                 continue;
 
-            for (Token dep : dependants)
-                for (Token gov : governors) {
-                    Integer depIdx = tokenPositions.get(dep);
+            for (Dependency dependency : dependencies) {
+                Token[] governors = dependencyParsingLayer.getGovernorTokens(dependency);
+                if (governors == null)
+                    continue;
+
+                for (Token governor : governors) {
                     if (depIdx == null)
                         throw new RuntimeException(String.format("Dependent in relation is not in the corresponding sentence: %s", dep));
 
-                    Integer govIdx = tokenPositions.get(gov);
+                    Integer govIdx = tokenPositions.get(governor);
                     if (govIdx == null)
-                        throw new RuntimeException(String.format("Governor in relation is not in the corresponding sentence: %s", gov));
+                        throw new RuntimeException(String.format("Governor in relation is not in the corresponding sentence: %s", governor));
 
                     depBuilder.put(depIdx, new RelationGovernor(dependency.getFunction(), govIdx));
                 }
+            }
         }
 
         return depBuilder.build();
@@ -107,8 +133,7 @@ public class TCFReader implements CorpusReader {
 
         Map<Integer, RelationGovernor> dependencies = null;
         if (dependencyParsingLayer != null) {
-            DependencyParse parse = dependencyParsingLayer.getParse(currentSentence);
-            dependencies = extractDependencies(parse, tokenPositions);
+            dependencies = extractDependencies(tcfTokens, tokenPositions);
         }
 
         ImmutableList.Builder<eu.danieldk.nlp.conllx.Token> tokensBuilder = ImmutableList.builder();
