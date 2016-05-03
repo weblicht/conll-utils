@@ -4,7 +4,7 @@
 
     <groupId>de.tuebingen.uni.sfs.clarind</groupId>
     <artifactId>conllutils</artifactId>
-    <version>1.2.0</version>
+    <version>1.2.1-SNAPSHOT</version>
 
     <developers>
         <developer>
@@ -18,7 +18,7 @@
         <url>https://github.com/weblicht/conll-utils</url>
         <connection>scm:git:https://github.com/weblicht/conll-utils.git</connection>
         <developerConnection>scm:git:git@github.com:weblicht/conll-utils.git</developerConnection>
-      <tag>conllutils-1.2.0</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <properties>
